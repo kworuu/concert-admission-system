@@ -80,24 +80,3 @@ This system models real-world concert operations, including:
   **Behavior:**
   The Concert manages its seating tiers and tracks how many tickets have been sold.
   Every ticket issued belongs to the concert (composition — when the concert is deleted, its tickets are also gone).
-
-### LocalDate
-
-  Represents the full date and time of the concert using simple integer fields. This class is used internally by the
-  Concert entity to store schedule information without relying on external date/time libraries.
-
-  Fields:
-  - day : int
-  - month : int
-  - year : int
-  - hour : int
-  - minute : int
-
-  **Behavior:**
-  The LocalDate class stores and returns date/time values and provides formatted access to the concert schedule.
-  It is part of the Concert through composition, meaning the LocalDate object cannot exist without the Concert that owns it.
-
-
- 
-
-  
