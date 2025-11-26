@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="Home.HOME">
-  <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="GridLayoutManager" row-count="8" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ConcertAdmissionSystem.ConcertAdmissionSystemUI">
+  <grid id="27dc6" binding="contentpane" layout-manager="GridLayoutManager" row-count="7" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="20" left="20" bottom="20" right="20"/>
     <constraints>
       <xy x="20" y="20" width="1062" height="868"/>
@@ -21,10 +21,10 @@
       </grid>
       <vspacer id="2ece0">
         <constraints>
-          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+          <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
         </constraints>
       </vspacer>
-      <grid id="c3f64" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="c3f64" binding="concertDetailsPanel" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="10" left="10" bottom="10" right="10"/>
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -45,17 +45,8 @@
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <labelFor value="a61f7"/>
               <text value="Select Concert:"/>
-            </properties>
-          </component>
-          <component id="a61f7" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
-            <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <model>
-                <item value="The Eras Tour (December 24, 2025)"/>
-              </model>
             </properties>
           </component>
           <component id="e5810" class="javax.swing.JLabel">
@@ -72,9 +63,17 @@
             </constraints>
             <properties/>
           </component>
+          <component id="a61f7" class="javax.swing.JComboBox" binding="cmbox_selectConcert">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <model/>
+            </properties>
+          </component>
         </children>
       </grid>
-      <grid id="d259a" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="d259a" binding="customerInformationPanel" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="10" left="10" bottom="10" right="10"/>
         <constraints>
           <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -118,7 +117,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="Enter full name"/>
+                  <text value=""/>
                 </properties>
               </component>
               <component id="3fe31" class="javax.swing.JLabel">
@@ -136,7 +135,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="Enter email address"/>
+                  <text value=""/>
                 </properties>
               </component>
               <component id="3c84" class="javax.swing.JLabel">
@@ -154,7 +153,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="Enter age"/>
+                  <text value=""/>
                 </properties>
               </component>
             </children>
@@ -194,7 +193,7 @@
         <border type="none"/>
         <children/>
       </grid>
-      <grid id="892f7" layout-manager="GridLayoutManager" row-count="6" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="892f7" binding="seatSelectionPanel" layout-manager="GridLayoutManager" row-count="6" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="10" left="10" bottom="10" right="10"/>
         <constraints>
           <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -223,17 +222,12 @@
               <text value="Filter Tier:"/>
             </properties>
           </component>
-          <component id="35dae" class="javax.swing.JComboBox" binding="comboBox2" default-binding="true">
+          <component id="35dae" class="javax.swing.JComboBox" binding="cmbox_seatingTierFilter">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <model>
-                <item value="All"/>
-                <item value="VVIP (PHP 2000)"/>
-                <item value="VIP (PHP 1000)"/>
-                <item value="General Admission (PHP 600)"/>
-              </model>
+              <model/>
             </properties>
           </component>
           <grid id="ffc85" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -270,7 +264,7 @@
               </hspacer>
             </children>
           </grid>
-          <scrollpane id="80dd9">
+          <scrollpane id="80dd9" binding="scrollPanel">
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
                 <preferred-size width="-1" height="125"/>
@@ -279,7 +273,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <grid id="f1475" layout-manager="GridLayoutManager" row-count="6" column-count="10" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="f1475" binding="panelInsideScroll" layout-manager="GridLayoutManager" row-count="6" column-count="10" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="10" left="10" bottom="10" right="10"/>
                 <constraints/>
                 <properties/>
@@ -357,7 +351,7 @@
                       <text value="VV-A7"/>
                     </properties>
                   </component>
-                  <component id="282db" class="javax.swing.JButton" binding="vB1Button2" default-binding="true">
+                  <component id="282db" class="javax.swing.JButton" binding="vB1Button">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -365,7 +359,7 @@
                       <text value="V-B1"/>
                     </properties>
                   </component>
-                  <component id="5638b" class="javax.swing.JButton" binding="vB2Button1" default-binding="true">
+                  <component id="5638b" class="javax.swing.JButton" binding="vB2Button">
                     <constraints>
                       <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -373,7 +367,7 @@
                       <text value="V-B2"/>
                     </properties>
                   </component>
-                  <component id="893fd" class="javax.swing.JButton" binding="vB3Button1" default-binding="true">
+                  <component id="893fd" class="javax.swing.JButton" binding="vB3Button">
                     <constraints>
                       <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -381,7 +375,7 @@
                       <text value="V-B3"/>
                     </properties>
                   </component>
-                  <component id="cbb4c" class="javax.swing.JButton" binding="vB4Button1" default-binding="true">
+                  <component id="cbb4c" class="javax.swing.JButton" binding="vB4Button">
                     <constraints>
                       <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -389,7 +383,7 @@
                       <text value="V-B4"/>
                     </properties>
                   </component>
-                  <component id="9af67" class="javax.swing.JButton" binding="vB5Button1" default-binding="true">
+                  <component id="9af67" class="javax.swing.JButton" binding="vB5Button">
                     <constraints>
                       <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -397,7 +391,7 @@
                       <text value="V-B5"/>
                     </properties>
                   </component>
-                  <component id="338c8" class="javax.swing.JButton" binding="vB6Button1" default-binding="true">
+                  <component id="338c8" class="javax.swing.JButton" binding="vB6Button">
                     <constraints>
                       <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -405,7 +399,7 @@
                       <text value="V-B6"/>
                     </properties>
                   </component>
-                  <component id="55b9a" class="javax.swing.JButton" binding="vB8Button1" default-binding="true">
+                  <component id="55b9a" class="javax.swing.JButton" binding="vB8Button">
                     <constraints>
                       <grid row="1" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -413,7 +407,7 @@
                       <text value="V-B8"/>
                     </properties>
                   </component>
-                  <component id="c4d5b" class="javax.swing.JButton" binding="vB9Button1" default-binding="true">
+                  <component id="c4d5b" class="javax.swing.JButton" binding="vB9Button">
                     <constraints>
                       <grid row="1" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -429,7 +423,7 @@
                       <text value="V-B10"/>
                     </properties>
                   </component>
-                  <component id="2acf6" class="javax.swing.JButton" binding="vB7Button1" default-binding="true">
+                  <component id="2acf6" class="javax.swing.JButton" binding="vB7Button">
                     <constraints>
                       <grid row="1" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -669,12 +663,12 @@
                       <text value="G-E9"/>
                     </properties>
                   </component>
-                  <component id="3f0d" class="javax.swing.JButton" binding="g10Button" default-binding="true">
+                  <component id="3f0d" class="javax.swing.JButton" binding="gE10Button">
                     <constraints>
                       <grid row="4" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
-                      <text value="G-10"/>
+                      <text value="G-E10"/>
                     </properties>
                   </component>
                   <component id="8fcc6" class="javax.swing.JButton" binding="VVA1Button" default-binding="true">
@@ -785,7 +779,7 @@
                   <text value="Selected Seat: "/>
                 </properties>
               </component>
-              <component id="ea80c" class="javax.swing.JLabel">
+              <component id="ea80c" class="javax.swing.JLabel" binding="selectedSeatLabel">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -801,7 +795,7 @@
                   <text value="Price:"/>
                 </properties>
               </component>
-              <component id="f34e4" class="javax.swing.JLabel">
+              <component id="f34e4" class="javax.swing.JLabel" binding="priceLabel">
                 <constraints>
                   <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -813,9 +807,9 @@
           </grid>
         </children>
       </grid>
-      <component id="d1b0" class="javax.swing.JButton" binding="CONFIRMTICKETDETAILSButton" default-binding="true">
+      <component id="d1b0" class="javax.swing.JButton" binding="btnConfirmTicketDetails">
         <constraints>
-          <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="CONFIRM TICKET DETAILS"/>
