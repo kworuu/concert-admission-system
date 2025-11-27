@@ -10,6 +10,15 @@ public class Ticket {
     private LocalDate timeBought;
     private Seat seat;
 
+    public Ticket(String ticketID, double price, Concert concert, SeatingTier seating, Seat seat, LocalDate timeBought) {
+        this.ticketID = ticketID;
+        this.price = price;
+        this.concert = concert;
+        this.seating = seating;
+        this.seat = seat;
+        this.timeBought = timeBought;
+    }
+
     public String getTicketID() {
         return ticketID;
     }
@@ -36,10 +45,10 @@ public class Ticket {
 
     double calculateFinalPrice(){
 
-        return 0;
+        return price;
     }
 
     void printTicket(){
-
+        //andrei generate pdf and ticket tix eme-eme
     }
 }
