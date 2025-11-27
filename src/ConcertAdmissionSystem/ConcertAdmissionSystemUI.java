@@ -125,6 +125,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
         initalizeSeatButtons();
 
         // Load Info : DRI
+        loadInfo();
 
         // HOME notes 3 : Add filtering functionality
         cmbox_seatingTierFilter.addActionListener(new ActionListener() {
@@ -237,11 +238,33 @@ public class ConcertAdmissionSystemUI extends JFrame {
         int response = JOptionPane.showConfirmDialog(this, "Confirm purchase for seat?", "Confirm", JOptionPane.YES_NO_OPTION);
 
         if (response == JOptionPane.YES_OPTION) {
+            // **FIRST: Get the seat number BEFORE changing the text**
+            String actualSeatNumber = selectedSeat.getText(); // e.g., "VVA1", "vB2", etc.
+
+            // Determine which tier this seat belongs to
+            String tier = "";
+            if (vvip_buttons.contains(selectedSeat)) {
+                tier = "VVIP";
+            } else if (vip_buttons.contains(selectedSeat)) {
+                tier = "VIP";
+            } else if (generalAdmission_buttons.contains(selectedSeat)) {
+                tier = "General Admission";
+            }
+
+            // Save to CSV BEFORE changing button appearance
+            TicketManager.saveTicket(
+                    actualSeatNumber,
+                    enterFullNameTextField.getText().trim(),
+                    enterEmailAddressTextField.getText().trim(),
+                    enterAgeTextField.getText().trim(),
+                    priceLabel.getText().replace("PHP ", "").trim(),
+                    tier
+            );
+
+            // NOW update the button appearance
             selectedSeat.setText("TAKEN");
             selectedSeat.setBackground(COLOR_SOLD);
             selectedSeat.setForeground(Color.WHITE);
-
-            // Fix for Mac/Windows styling issues
             selectedSeat.setOpaque(true);
             selectedSeat.setBorderPainted(false);
 
@@ -391,5 +414,37 @@ public class ConcertAdmissionSystemUI extends JFrame {
         // now that some buttons are hidden.
         panelInsideScroll.revalidate();
         panelInsideScroll.repaint();
+    }
+
+    // NEW METHOD: Reads the CSV and updates the UI
+    public void loadInfo() {
+        // 1. Get the list of taken seats from the CSV
+        List<String> takenSeats = TicketManager.loadSoldSeats();
+
+        // 2. Combine all buttons into one list to search them easily
+        List<JButton> allButtons = new ArrayList<>();
+        allButtons.addAll(vvip_buttons);
+        allButtons.addAll(vip_buttons);
+        allButtons.addAll(generalAdmission_buttons);
+
+        // 3. Loop through every button
+        for (JButton btn : allButtons) {
+            // If the button's text (e.g., "VVA1") is in our sold list...
+            if (takenSeats.contains(btn.getText())) {
+                // ...mark it as SOLD
+                btn.setText("TAKEN");
+                btn.setBackground(COLOR_SOLD);
+                btn.setForeground(Color.WHITE);
+                btn.setOpaque(true);
+                btn.setBorderPainted(false);
+
+                // Update the counter
+                soldSeats++;
+            }
+        }
+
+        // 4. Update the progress bar to show the correct count
+        progressBar1.setValue(soldSeats);
+        progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
     }
 }
