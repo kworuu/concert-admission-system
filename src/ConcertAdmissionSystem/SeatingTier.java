@@ -19,7 +19,11 @@ public class SeatingTier extends Ticket{
     }
 
     void sellOneSeat() {
-        currentSold ++;
+        currentSold++;
+    }
+
+    int getCurrentSold() {
+        return currentSold;
     }
 
     boolean isAvailable(){
