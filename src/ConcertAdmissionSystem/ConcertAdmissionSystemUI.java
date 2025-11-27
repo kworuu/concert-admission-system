@@ -172,7 +172,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
     private void handleSeatSelection(JButton clickedButton) {
 
-        if (clickedButton.getText().equals("X")) {
+        if (clickedButton.getText().equals("TAKEN")) {
             JOptionPane.showMessageDialog(this, "This seat is already taken!");
             return;
         }
@@ -235,7 +235,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
         int response = JOptionPane.showConfirmDialog(this, "Confirm purchase for seat?", "Confirm", JOptionPane.YES_NO_OPTION);
 
         if (response == JOptionPane.YES_OPTION) {
-            selectedSeat.setText("X");
+            selectedSeat.setText("TAKEN");
             selectedSeat.setBackground(COLOR_SOLD);
             selectedSeat.setForeground(Color.WHITE);
 
