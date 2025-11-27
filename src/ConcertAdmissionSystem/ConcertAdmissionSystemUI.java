@@ -124,6 +124,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
         // HOME notes 2 : COLOR INITIALIZATION & LISTENERES
         initalizeSeatButtons();
 
+        // Load Info : DRI
 
         // HOME notes 3 : Add filtering functionality
         cmbox_seatingTierFilter.addActionListener(new ActionListener() {
