@@ -88,6 +88,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private JLabel selectedSeatLabel;
     private JLabel priceLabel;
     private JPanel panelInsideScroll;
+    private JLabel perksLabel;
 
     // Create Lists to Group Buttons
     private final List<JButton> vvip_buttons = new ArrayList<>();
