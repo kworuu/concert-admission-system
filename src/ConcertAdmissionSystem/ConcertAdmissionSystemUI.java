@@ -212,21 +212,39 @@ public class ConcertAdmissionSystemUI extends JFrame {
             return;
         }
 
+        String name = enterFullNameTextField.getText().trim();
+        if (!checkName(name)) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid name.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+        }
+
+
         if (enterEmailAddressTextField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter your Email Address.", "Missing Input", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        String emailAdd = enterEmailAddressTextField.getText().trim();
+         if(!(isValidEmail(emailAdd))){
+             JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+             return;
+         }
+
 
         String ageText = enterAgeTextField.getText().trim();
         if(ageText.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter your age.", "Missing Input", JOptionPane.WARNING_MESSAGE);
         }
 
+
         // Validate that age is actually a number
         try {
             int age = Integer.parseInt(ageText);
-            if (age < 1) {
+            if (age < 1 ) {
                 JOptionPane.showMessageDialog(this, "Please enter a valid age.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            else if(age > 90){
+                JOptionPane.showMessageDialog(this, "Individuals of this age are advised not to attend the concert", "Warning!", JOptionPane.WARNING_MESSAGE);
                 return;
             }
         } catch (NumberFormatException e) {
@@ -446,5 +464,18 @@ public class ConcertAdmissionSystemUI extends JFrame {
         // 4. Update the progress bar to show the correct count
         progressBar1.setValue(soldSeats);
         progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
+    }
+
+    public static boolean isValidEmail(String email){
+        String regex = "^[\\p{L}0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+        return email.matches(regex);
+    }
+
+    public static boolean checkName(String name){
+        if(!name.matches("[\\p{L} '\\-]+")){
+            return false;
+        }
+
+        return true;
     }
 }

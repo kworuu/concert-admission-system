@@ -2,15 +2,15 @@ package ConcertAdmissionSystem;
 
 import java.time.LocalDate;
 
-public class SeatingTier extends Ticket{
+public class SeatingTier {
     private String tierName;
     private double basePrice;
     private String perks;
     private int maxCapacity;
     private int currentSold;
 
-    public SeatingTier(String ticketID, double price, Concert concert, SeatingTier seating, Seat seat, LocalDate timeBought, String tierName, double basePrice, String perks, int maxCapacity, int currentSold) {
-        super(ticketID, price, concert, seating, seat, timeBought);
+    public SeatingTier(Ticket ticket, String ticketID, double price, Concert concert, SeatingTier seating, Seat seat, LocalDate timeBought, String tierName, double basePrice, String perks, int maxCapacity, int currentSold) {
+//        super(price, concert, seating, seat, timeBought);
         this.tierName = tierName;
         this.basePrice = basePrice;
         this.perks = perks;
