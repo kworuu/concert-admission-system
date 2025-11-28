@@ -4,22 +4,25 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class Concert {
-    private String concertName;
-    private LocalDate concertDate;
-    private String artist;
-    private int totalTicketsSold;
-    private String venue;
-    private List<SeatingTier> seatingTierList;
+    private String concertName = "WildCats Pub Concert";
+    private LocalDate concertDate = LocalDate.of(2025, 11, 27);
+    private String artist = "Zild";
+    private String venue = "WIldCats Pub";
 
-    String getConcertInfo(){
-        return "";
+    public String getConcertName() {
+        return concertName;
     }
 
-    void incrementSoldCount(){
-
+    public LocalDate getConcertDate() {
+        return concertDate;
     }
 
-    int getTotalTicketsSold(){
-        return totalTicketsSold;
+    public String getArtist() {
+        return artist;
     }
+
+    public String getVenue() {
+        return venue;
+    }
+
 }
