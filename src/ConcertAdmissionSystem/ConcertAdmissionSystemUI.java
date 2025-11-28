@@ -8,8 +8,6 @@ import java.util.List;
 import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 public class ConcertAdmissionSystemUI extends JFrame {
     private JPanel contentpane;
@@ -89,6 +87,9 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private JLabel priceLabel;
     private JPanel panelInsideScroll;
     private JLabel perksLabel;
+    private JTextField details_concertDate;
+    private JTextField details_artist;
+    private JTextField textField1;
 
     // Create Lists to Group Buttons
     private final List<JButton> vvip_buttons = new ArrayList<>();
