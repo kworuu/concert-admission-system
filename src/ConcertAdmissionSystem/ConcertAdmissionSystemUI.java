@@ -4,10 +4,13 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ConcertAdmissionSystemUI extends JFrame {
     private JPanel contentpane;
@@ -96,6 +99,9 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private final List<JButton> vip_buttons = new ArrayList<>();
     private final List<JButton> generalAdmission_buttons = new ArrayList<>();
 
+    private List<Concert> availableConcerts;
+
+
     // Local Variables
     private JButton selectedSeat = null;
 
@@ -117,10 +123,38 @@ public class ConcertAdmissionSystemUI extends JFrame {
         pack();
         setLocationRelativeTo(null);
 
+        // Set the detail fields to read-only
+        details_concertDate.setEditable(false);
+        details_artist.setEditable(false);
+        textField1.setEditable(false); // Assuming textField1 is the Venue field
+
+        // You may also want to change the background to distinguish them
+        // from editable fields, although setEditable(false) usually handles appearance.
+        Color readOnlyBg = new Color(240, 240, 240); // A light gray color
+        details_concertDate.setBackground(readOnlyBg);
+        details_artist.setBackground(readOnlyBg);
+        textField1.setBackground(readOnlyBg);
         // HOME notes 1 : Initialize the groups.
         groupButtons();
         populateComboBox();
 
+        cmbox_selectConcert.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedName = (String) cmbox_selectConcert.getSelectedItem();
+
+                // Find the corresponding Concert object in your list
+                if (selectedName != null) {
+                    for (Concert concert : availableConcerts) {
+                        if (concert.getConcertName().equals(selectedName)) {
+                            loadConcertDetails(concert); // Update the details panel
+                            // loadInfo(); // You would call loadInfo() here to refresh sold seats
+                            break;
+                        }
+                    }
+                }
+            }
+        });
 
         // HOME notes 2 : COLOR INITIALIZATION & LISTENERES
         initalizeSeatButtons();
@@ -389,8 +423,27 @@ public class ConcertAdmissionSystemUI extends JFrame {
         // --- Box 1: Concert Selection ---
         // Clear it first to be safe (in case the GUI designer added example items)
         cmbox_selectConcert.removeAllItems();
-        cmbox_selectConcert.addItem("The Eras Tour (December 24, 2025)");
 
+        availableConcerts = new ArrayList<>();
+        LocalDateTime concertDate = LocalDateTime.of(2025, 12,25,19,0);
+        Concert concert1 = new Concert("WildCats Pub Concert for a Cause", concertDate, "Zild", "CIT-U Gymnasium");
+        availableConcerts.add(concert1);
+
+        // 2. Box 1: Concert Selection
+        cmbox_selectConcert.removeAllItems();
+        for (Concert concert : availableConcerts) {
+            // We add the name to the JComboBox
+            cmbox_selectConcert.addItem(concert.getConcertName());
+        }
+
+        // 3. Set the initial details
+        if (!availableConcerts.isEmpty()) {
+            // Load details for the first concert by passing the object
+            loadConcertDetails(availableConcerts.get(0));
+        }
+
+        cmbox_selectConcert.removeAllItems();
+        cmbox_selectConcert.addItem(concert1.getConcertName());
         // --- Box 2: Filter Selection ---
         // 1. Clear existing items (removes the stuff you typed in the GUI Designer)
         cmbox_seatingTierFilter.removeAllItems();
@@ -402,6 +455,22 @@ public class ConcertAdmissionSystemUI extends JFrame {
         cmbox_seatingTierFilter.addItem("General Admission (PHP 600)");
     }
 
+    public void loadConcertDetails(Concert concert) { // Now accepts the concert object
+        if (concert == null) return; // Safety check
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' h:mm a");
+
+        String formattedDateTime = concert.getConcertDate().format(dtf); // Fixed: Use the passed 'concert' object
+
+        details_artist.setText(concert.getArtist());
+        details_concertDate.setText(formattedDateTime);
+        textField1.setText(concert.getVenue());
+        perksLabel.setText("No specific perks listed. Check the official concert website.");
+
+        // IMPORTANT: When a new concert is loaded, you must also reset the seat map
+        // and soldSeats count, and then call loadInfo() to load the sold seats for
+        // this specific concert (assuming TicketManager is updated to handle it).
+    }
     public void filterSeats() {
         String selectedTier = (String) cmbox_seatingTierFilter.getSelectedItem();
 
