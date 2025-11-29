@@ -8,7 +8,7 @@ public class Seat {
     private boolean isTaken;
     private SeatingTier tier;
 
-    public Seat(double price, Concert concert, SeatingTier seating, Seat seat, LocalDate timeBought, String tierName, double basePrice, String perks, int maxCapacity, int currentSold, String seatNumber, String row, boolean isTaken, SeatingTier tier) {
+    public Seat(SeatingTier tier, String seatNumber, String row) {
 //        super(price, concert, seating, seat, timeBought, tierName, basePrice, perks, maxCapacity, currentSold);
         this.seatNumber = seatNumber;
         this.row = row;
