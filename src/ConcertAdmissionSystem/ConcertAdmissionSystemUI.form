@@ -881,7 +881,7 @@
                   <text value="Seat Tier:"/>
                 </properties>
               </component>
-              <component id="4c731" class="javax.swing.JLabel">
+              <component id="4c731" class="javax.swing.JLabel" binding="seatTierLabel">
                 <constraints>
                   <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>

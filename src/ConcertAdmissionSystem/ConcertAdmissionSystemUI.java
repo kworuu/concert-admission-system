@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.awt.Color;
 import javax.swing.JButton;
@@ -93,6 +92,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private JTextField details_concertDate;
     private JTextField details_artist;
     private JTextField textField1;
+    private JLabel seatTierLabel;
 
     // Create Lists to Group Buttons
     private final List<JButton> vvip_buttons = new ArrayList<>();
@@ -159,10 +159,17 @@ public class ConcertAdmissionSystemUI extends JFrame {
         // HOME notes 2 : COLOR INITIALIZATION & LISTENERES
         initalizeSeatButtons();
 
+        // HOME notes 3 : Configure Progress Bar (Fixed at 70)
+        progressBar1.setMinimum(0);
+        progressBar1.setMaximum(maximumCapacity);
+        progressBar1.setValue(1);
+        progressBar1.setStringPainted(true);
+        progressBar1.setString("0 / " + maximumCapacity + " Sold");
+
         // Load Info : DRI
         loadInfo();
 
-        // HOME notes 3 : Add filtering functionality
+        // HOME notes 4 : Add filtering functionality
         cmbox_seatingTierFilter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -170,12 +177,6 @@ public class ConcertAdmissionSystemUI extends JFrame {
             }
         });
 
-        // HOME notes 4 : Configure Progress Bar (Fixed at 70)
-        progressBar1.setMinimum(0);
-        progressBar1.setMaximum(maximumCapacity);
-        progressBar1.setValue(1);
-        progressBar1.setStringPainted(true);
-        progressBar1.setString("0 / " + maximumCapacity + " Sold");
 
         // HOME notes 5 : Confirm Button Listener
         btnConfirmTicketDetails.addActionListener(new ActionListener() {
@@ -228,11 +229,29 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
         // update price label
         if (vvip_buttons.contains(clickedButton)) {
-            priceLabel.setText("PHP 2000.00");
-        } else if (vip_buttons.contains(clickedButton)) {
-            priceLabel.setText("PHP 1000.00");
-        } else if (generalAdmission_buttons.contains(clickedButton)) {
             priceLabel.setText("PHP 600.00");
+        } else if (vip_buttons.contains(clickedButton)) {
+            priceLabel.setText("PHP 450.00");
+        } else if (generalAdmission_buttons.contains(clickedButton)) {
+            priceLabel.setText("PHP 200.00");
+        }
+
+        // update perks label
+        if (vvip_buttons.contains(clickedButton)) {
+            perksLabel.setText("Backstage Pass");
+        } else if (vip_buttons.contains(clickedButton)) {
+            perksLabel.setText("Free Table");
+        } else if (generalAdmission_buttons.contains(clickedButton)) {
+            perksLabel.setText("~none");
+        }
+
+        // update seatTier Label
+        if (vvip_buttons.contains(clickedButton)) {
+            perksLabel.setText("VVIP");
+        } else if (vip_buttons.contains(clickedButton)) {
+            perksLabel.setText("VIP");
+        } else if (generalAdmission_buttons.contains(clickedButton)) {
+            perksLabel.setText("General Admission");
         }
     }
 
@@ -450,9 +469,9 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
         // 2. Add the items directly
         cmbox_seatingTierFilter.addItem("All");
-        cmbox_seatingTierFilter.addItem("VVIP (PHP 2000)");
-        cmbox_seatingTierFilter.addItem("VIP (PHP 1000)");
-        cmbox_seatingTierFilter.addItem("General Admission (PHP 600)");
+        cmbox_seatingTierFilter.addItem("VVIP (PHP 600)");
+        cmbox_seatingTierFilter.addItem("VIP (PHP 450)");
+        cmbox_seatingTierFilter.addItem("General Admission (PHP 200)");
     }
 
     public void loadConcertDetails(Concert concert) { // Now accepts the concert object
@@ -478,9 +497,9 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
         // filterSeats notes 1 : Helper method to make code cleaner
         boolean showAll = selectedTier.equals("All");
-        boolean showVVIP = selectedTier.equals("VVIP (PHP 2000)");
-        boolean showVIP = selectedTier.equals("VIP (PHP 1000)");
-        boolean showGeneralAdmission = selectedTier.equals("General Admission (PHP 600)");
+        boolean showVVIP = selectedTier.equals("VVIP (PHP 600)");
+        boolean showVIP = selectedTier.equals("VIP (PHP 450)");
+        boolean showGeneralAdmission = selectedTier.equals("General Admission (PHP 200)");
 
         // filterSeats notes 2 : Loop through VVIP View buttons
         for (JButton btn : vvip_buttons) {
