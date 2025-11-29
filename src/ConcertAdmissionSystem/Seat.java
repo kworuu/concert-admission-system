@@ -8,12 +8,16 @@ public class Seat {
     private boolean isTaken;
     private SeatingTier tier;
 
-    public Seat(double price, Concert concert, SeatingTier seating, Seat seat, LocalDate timeBought, String tierName, double basePrice, String perks, int maxCapacity, int currentSold, String seatNumber, String row, boolean isTaken, SeatingTier tier) {
+    public Seat(String seatNumber, String row, SeatingTier tier) {
 //        super(price, concert, seating, seat, timeBought, tierName, basePrice, perks, maxCapacity, currentSold);
         this.seatNumber = seatNumber;
         this.row = row;
-        this.isTaken = isTaken;
+        this.isTaken = false;
         this.tier = tier;
+    }
+
+    public String getSeatNumber() {
+        return seatNumber;
     }
 
     void markAsTaken(){

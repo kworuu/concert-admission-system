@@ -18,6 +18,21 @@ public class SeatingTier {
         this.currentSold = currentSold;
     }
 
+    public SeatingTier(String tierName, double basePrice, String perks, int maxCapacity) {
+        this.tierName = tierName;
+        this.basePrice = basePrice;
+        this.perks = perks;
+        this.maxCapacity = maxCapacity;
+    }
+
+    public String getTierName() {
+        return tierName;
+    }
+
+    public double getBasePrice() {
+        return basePrice;
+    }
+
     void sellOneSeat() {
         currentSold ++;
     }
