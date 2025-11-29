@@ -261,49 +261,9 @@ public class ConcertAdmissionSystemUI extends JFrame {
             return;
         }
 
-        if (enterFullNameTextField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter your Full Name.", "Missing Input", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        String name = enterFullNameTextField.getText().trim();
-        if (!checkName(name)) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid name.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
-        }
-
-
-        if (enterEmailAddressTextField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter your Email Address.", "Missing Input", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        String emailAdd = enterEmailAddressTextField.getText().trim();
-         if(!(isValidEmail(emailAdd))){
-             JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
-             return;
-         }
-
-
-        String ageText = enterAgeTextField.getText().trim();
-        if(ageText.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter your age.", "Missing Input", JOptionPane.WARNING_MESSAGE);
-        }
-
-
-        // Validate that age is actually a number
-        try {
-            int age = Integer.parseInt(ageText);
-            if (age < 1 ) {
-                JOptionPane.showMessageDialog(this, "Please enter a valid age.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            else if(age > 90){
-                JOptionPane.showMessageDialog(this, "Individuals of this age are advised not to attend the concert", "Warning!", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Age must be a number.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
-            return;
+        Customer customer = createCustomerFromInput();
+        if (customer == null) {
+            return; // validation failed, stop
         }
 
         // SUCCESSFUL VALIDATION LOGIC
@@ -325,13 +285,14 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
             // Save to CSV BEFORE changing button appearance
             TicketManager.saveTicket(
-                    actualSeatNumber,
-                    enterFullNameTextField.getText().trim(),
-                    enterEmailAddressTextField.getText().trim(),
-                    enterAgeTextField.getText().trim(),
+                    selectedSeat.getText(),
+                    customer.getName(),
+                    customer.getEmail(),
+                    String.valueOf(customer.getAge()),
                     priceLabel.getText().replace("PHP ", "").trim(),
                     tier
             );
+
 
             // NOW update the button appearance
             selectedSeat.setText("TAKEN");
@@ -566,5 +527,58 @@ public class ConcertAdmissionSystemUI extends JFrame {
         }
 
         return true;
+    }
+
+    private Customer createCustomerFromInput(){
+        String name = enterFullNameTextField.getText().trim();
+        String email = enterEmailAddressTextField.getText().trim();
+        String ageText = enterAgeTextField.getText().trim();
+        int age;
+
+        //Name validation
+        if(name.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Please enter your Full Name.");
+            return null;
+        }
+
+        if(!checkName(name)){
+            JOptionPane.showMessageDialog(this, "Please enter a valid name.");
+            return null;
+        }
+
+        // Email validation
+        if(email.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Please enter your Email Address.");
+            return null;
+        }
+
+        if(!isValidEmail(email)){
+            JOptionPane.showMessageDialog(this, "Please enter a valid email address.");
+            return null;
+        }
+
+        //Age validation
+
+        if(ageText.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Please enter your age", "Missing Input", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+        try {
+            age = Integer.parseInt(ageText);
+            if (age < 1) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid age.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                return null;
+            } else if (age > 90) {
+                JOptionPane.showMessageDialog(this, "Individuals of this age are advised not to attend the concert", "Warning!", JOptionPane.WARNING_MESSAGE);
+                return null;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Age must be a number.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+
+        // All validations passed → create object
+        return new Customer(name, email, age);
+
     }
 }
