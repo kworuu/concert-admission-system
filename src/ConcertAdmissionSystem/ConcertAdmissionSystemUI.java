@@ -247,11 +247,11 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
         // update seatTier Label
         if (vvip_buttons.contains(clickedButton)) {
-            perksLabel.setText("VVIP");
+            seatTierLabel.setText("VVIP");
         } else if (vip_buttons.contains(clickedButton)) {
-            perksLabel.setText("VIP");
+            seatTierLabel.setText("VIP");
         } else if (generalAdmission_buttons.contains(clickedButton)) {
-            perksLabel.setText("General Admission");
+            seatTierLabel.setText("General Admission");
         }
     }
 
