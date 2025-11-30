@@ -49,11 +49,10 @@ public class Ticket {
     public Customer getCustomer(){ return customer; }
 
     double calculateFinalPrice(){
-
         return price;
     }
 
-    void printTicket(){
+    public void printTicket(){
         //andrei generate pdf and ticket tix eme-eme bayot
     }
 

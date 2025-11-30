@@ -7,7 +7,6 @@ import java.util.List;
 public class TicketManager {
 
     private static final String FILE_PATH = "TicketSold.csv";
-
     /**
      * Saves a ticket object to CSV
      * @param ticket The ticket object containing all information

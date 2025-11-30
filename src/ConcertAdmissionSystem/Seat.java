@@ -20,15 +20,30 @@ public class Seat {
         return seatNumber;
     }
 
-    void markAsTaken(){
+    public String getRow() {
+        return row;
+    }
+
+    public boolean isTaken() {
+        return isTaken;
+    }
+
+    public SeatingTier getTier() {
+        return tier;
+    }
+
+    public void markAsTaken(){
+        if(isTaken) {
+            throw new IllegalStateException("Seat " + seatNumber + " is already taken");
+        }
         isTaken = true;
     }
 
-    boolean isAvailable(){
-        return false;
+    public boolean isAvailable(){
+        return !isTaken;
     }
 
-    String getSeatInfo() {
+    public String getSeatInfo() {
         return "Row " + row + ", Seat " + seatNumber + " [" + tier.getTierInfo() + "] - " + (isTaken ? "Taken" : "Available");
     }
 

@@ -19,7 +19,9 @@ public class Customer {
         return email;
     }
 
-    public int getAge(){ return age; }
+    public int getAge(){
+        return age;
+    }
 
     void buyTicket(Ticket t) {
         t.saveToFile();
