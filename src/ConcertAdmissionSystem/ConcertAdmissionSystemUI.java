@@ -99,7 +99,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private final List<JButton> vip_buttons = new ArrayList<>();
     private final List<JButton> generalAdmission_buttons = new ArrayList<>();
 
-    private List<Concert> availableConcerts;
+//    private List<Concert> availableConcerts;
 
 
     // Local Variables
@@ -141,18 +141,20 @@ public class ConcertAdmissionSystemUI extends JFrame {
         cmbox_selectConcert.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String selectedName = (String) cmbox_selectConcert.getSelectedItem();
+//                String selectedName = (String) cmbox_selectConcert.getSelectedItem();
+                handleConcertSelection();
 
                 // Find the corresponding Concert object in your list
-                if (selectedName != null) {
-                    for (Concert concert : availableConcerts) {
-                        if (concert.getConcertName().equals(selectedName)) {
-                            loadConcertDetails(concert); // Update the details panel
-                            // loadInfo(); // You would call loadInfo() here to refresh sold seats
-                            break;
-                        }
-                    }
-                }
+//                if (selectedName != null) {
+//                    for (Concert concert : availableConcerts) {
+//                        if (concert.getConcertName().equals(selectedName)) {
+//                            loadConcertDetails(concert); // Update the details panel
+//                            // loadInfo(); // You would call loadInfo() here to refresh sold seats
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
             }
         });
 
@@ -443,26 +445,33 @@ public class ConcertAdmissionSystemUI extends JFrame {
         // Clear it first to be safe (in case the GUI designer added example items)
         cmbox_selectConcert.removeAllItems();
 
-        availableConcerts = new ArrayList<>();
-        LocalDateTime concertDate = LocalDateTime.of(2025, 12,25,19,0);
-        Concert concert1 = new Concert("WildCats Pub Concert for a Cause", concertDate, "Zild", "CIT-U Gymnasium");
-        availableConcerts.add(concert1);
+        List<Concert> concertList = ConcertManager.getInstance().getAvailableConcerts();
 
-        // 2. Box 1: Concert Selection
-        cmbox_selectConcert.removeAllItems();
-        for (Concert concert : availableConcerts) {
+
+
+//        availableConcerts = new ArrayList<>();
+//        LocalDateTime concertDate = LocalDateTime.of(2025, 12,25,19,0);
+//        Concert concert1 = new Concert("WildCats Pub Concert for a Cause", concertDate, "Zild", "CIT-U Gymnasium");
+//        availableConcerts.add(concert1);
+//
+//        // 2. Box 1: Concert Selection
+//        cmbox_selectConcert.removeAllItems();
+
+        for (Concert concert : concertList){
             // We add the name to the JComboBox
             cmbox_selectConcert.addItem(concert.getConcertName());
         }
 
         // 3. Set the initial details
-        if (!availableConcerts.isEmpty()) {
+        if (!concertList.isEmpty()) {
+
+            cmbox_selectConcert.setSelectedIndex(0);
             // Load details for the first concert by passing the object
-            loadConcertDetails(availableConcerts.get(0));
+            loadConcertDetails(concertList.get(0));
         }
 
-        cmbox_selectConcert.removeAllItems();
-        cmbox_selectConcert.addItem(concert1.getConcertName());
+//        cmbox_selectConcert.removeAllItems();
+//        cmbox_selectConcert.addItem(concert1.getConcertName());
         // --- Box 2: Filter Selection ---
         // 1. Clear existing items (removes the stuff you typed in the GUI Designer)
         cmbox_seatingTierFilter.removeAllItems();
@@ -566,5 +575,17 @@ public class ConcertAdmissionSystemUI extends JFrame {
         }
 
         return true;
+    }
+
+    public void handleConcertSelection(){
+        String selectedName = (String) cmbox_selectConcert.getSelectedItem();
+
+        if(selectedName != null){
+            Concert selectedConcert = ConcertManager.getInstance().getConcertByTitle(selectedName);
+
+            if (selectedConcert != null) {
+                loadConcertDetails(selectedConcert);
+            }
+        }
     }
 }
