@@ -195,18 +195,18 @@ public class ConcertAdmissionSystemUI extends JFrame {
                 handleSeatSelection(clickedButton);
             }
         };
-        for (JButton btn : vvip_buttons) {
-            btn.setBackground(COLOR_VVIP);
-            btn.addActionListener(seatListener);
-        }
-        for (JButton btn : vip_buttons) {
-            btn.setBackground(COLOR_VIP);
-            btn.addActionListener(seatListener);
-        }
-        for (JButton btn : generalAdmission_buttons) {
-            btn.setBackground(COLOR_GEN);
-            btn.addActionListener(seatListener);
-        }
+            for (JButton btn : vvip_buttons) {
+                btn.setBackground(COLOR_VVIP);
+                btn.addActionListener(seatListener);
+            }
+            for (JButton btn : vip_buttons) {
+                btn.setBackground(COLOR_VIP);
+                btn.addActionListener(seatListener);
+            }
+            for (JButton btn : generalAdmission_buttons) {
+                btn.setBackground(COLOR_GEN);
+                btn.addActionListener(seatListener);
+            }
     }
 
     private void handleSeatSelection(JButton clickedButton) {
@@ -266,65 +266,36 @@ public class ConcertAdmissionSystemUI extends JFrame {
             return; // validation failed, stop
         }
 
+        // SUCCESSFUL VALIDATION LOGIC
         int response = JOptionPane.showConfirmDialog(this, "Confirm purchase for seat?", "Confirm", JOptionPane.YES_NO_OPTION);
 
         if (response == JOptionPane.YES_OPTION) {
-            // GET SEAT NUMBER BEFORE CHANGING TEXT
-            String actualSeatNumber = selectedSeat.getText();
+            // **FIRST: Get the seat number BEFORE changing the text**
+            String actualSeatNumber = selectedSeat.getText(); // e.g., "VVA1", "vB2", etc.
 
-            // DETERMINE TIER AND PRICE
-            String tierName = "";
-            double price = 0.0;
-            SeatingTier seatingTier = null;
-
+            // Determine which tier this seat belongs to
+            String tier = "";
             if (vvip_buttons.contains(selectedSeat)) {
-                tierName = "VVIP";
-                price = 2000.0;
-                seatingTier = new SeatingTier(tierName, price, "VIP lounge access, meet & greet", 10);
+                tier = "VVIP";
             } else if (vip_buttons.contains(selectedSeat)) {
-                tierName = "VIP";
-                price = 1000.0;
-                seatingTier = new SeatingTier(tierName, price, "Priority seating, backstage pass", 20);
+                tier = "VIP";
             } else if (generalAdmission_buttons.contains(selectedSeat)) {
-                tierName = "General Admission";
-                price = 600.0;
-                seatingTier = new SeatingTier(tierName, price, "Standard entry", 40);
+                tier = "General Admission";
             }
 
-
-            // Extract row from seat number (e.g., "VVA1" -> row "A")
-            String row = actualSeatNumber.substring(0, actualSeatNumber.length() - 1);
-            Seat seat = new Seat(actualSeatNumber, row, seatingTier);
-
-            // Get the selected concert
-            String selectedConcertName = (String) cmbox_selectConcert.getSelectedItem();
-            Concert selectedConcert = null;
-            for (Concert c : availableConcerts) {
-                if (c.getConcertName().equals(selectedConcertName)) {
-                    selectedConcert = c;
-                    break;
-                }
-            }
-
-            // CREATE THE TICKET OBJECT
-            Ticket ticket = new Ticket(customer, price, selectedConcert, seatingTier, seat);
-
-            // CUSTOMER BUYS THE TICKET (SAVES TO CSV)
-            customer.buyTicket(ticket);
-
-            // UPDATE UI
+            // NOW update the button appearance
             selectedSeat.setText("TAKEN");
             selectedSeat.setBackground(COLOR_SOLD);
             selectedSeat.setForeground(Color.WHITE);
             selectedSeat.setOpaque(true);
             selectedSeat.setBorderPainted(false);
 
-            // UPDATE PROGRESS BAR
+            // Update progress bar counter
             soldSeats++;
             progressBar1.setValue(soldSeats);
             progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
 
-            // CLEAR FORM
+            // clear the selection variable for the next person
             selectedSeat = null;
             selectedSeatLabel.setText("~none");
             priceLabel.setText("PHP 0.00");
@@ -504,29 +475,32 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
     // NEW METHOD: Reads the CSV and updates the UI
     public void loadInfo() {
-        soldSeats = TicketManager.getSoldTicketCount();
-
-        // 2. Get the list of taken seats from the CSV
+        // 1. Get the list of taken seats from the CSV
         List<String> takenSeats = TicketManager.loadSoldSeats();
 
-        // 3. Combine all buttons into one list to search them easily
+        // 2. Combine all buttons into one list to search them easily
         List<JButton> allButtons = new ArrayList<>();
         allButtons.addAll(vvip_buttons);
         allButtons.addAll(vip_buttons);
         allButtons.addAll(generalAdmission_buttons);
 
-        // 4. Loop through every button and mark as taken
+        // 3. Loop through every button
         for (JButton btn : allButtons) {
+            // If the button's text (e.g., "VVA1") is in our sold list...
             if (takenSeats.contains(btn.getText())) {
+                // ...mark it as SOLD
                 btn.setText("TAKEN");
                 btn.setBackground(COLOR_SOLD);
                 btn.setForeground(Color.WHITE);
                 btn.setOpaque(true);
                 btn.setBorderPainted(false);
+
+                // Update the counter
+                soldSeats++;
             }
         }
 
-        // 5. Update the progress bar with the correct count from CSV
+        // 4. Update the progress bar to show the correct count
         progressBar1.setValue(soldSeats);
         progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
     }

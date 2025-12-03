@@ -6,16 +6,8 @@ public class SeatingTier {
     private String tierName;
     private double price;
     private String perks;
-    private int maxCapacity;
 
-    public SeatingTier(String tierName, double price, String perks, int maxCapacity) {
-        this.tierName = tierName;
-        this.price = price;
-        this.perks = perks;
-        this.maxCapacity = maxCapacity;
-    }
-
-    public SeatingTier(String tierName, double basePrice, String perks) {
+    public SeatingTier(String tierName, double price, String perks) {
         this.tierName = tierName;
         this.price = price;
         this.perks = perks;
