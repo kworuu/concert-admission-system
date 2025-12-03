@@ -11,10 +11,6 @@ public class Customer {
         this.age = age;
     }
 
-    public int getAge() {
-        return age;
-    }
-
     public String getName() {
         return name;
     }
@@ -23,7 +19,11 @@ public class Customer {
         return email;
     }
 
-    void buyTicket(Ticket t) {
+    public int getAge(){
+        return age;
+    }
 
+    void buyTicket(Ticket t) {
+        t.saveToFile();
     }
 }

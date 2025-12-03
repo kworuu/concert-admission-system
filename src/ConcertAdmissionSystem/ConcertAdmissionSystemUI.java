@@ -283,17 +283,6 @@ public class ConcertAdmissionSystemUI extends JFrame {
                 tier = "General Admission";
             }
 
-            // Save to CSV BEFORE changing button appearance
-            TicketManager.saveTicket(
-                    selectedSeat.getText(),
-                    customer.getName(),
-                    customer.getEmail(),
-                    String.valueOf(customer.getAge()),
-                    priceLabel.getText().replace("PHP ", "").trim(),
-                    tier
-            );
-
-
             // NOW update the button appearance
             selectedSeat.setText("TAKEN");
             selectedSeat.setBackground(COLOR_SOLD);
