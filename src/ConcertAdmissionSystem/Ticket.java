@@ -46,13 +46,20 @@ public class Ticket {
         return seat;
     }
 
-    double calculateFinalPrice(){
+    public Customer getCustomer(){ 
+        return customer; 
+    }
 
+    double calculateFinalPrice(){
         return price;
     }
 
-    void printTicket(){
+    public void printTicket(){
         //andrei generate pdf and ticket tix eme-eme bayot
+    }
+
+    public void saveToFile(){
+        TicketManager.saveTicket(this);
     }
 
     String generateTicketID(){
