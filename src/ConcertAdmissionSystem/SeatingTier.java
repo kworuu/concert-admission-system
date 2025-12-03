@@ -13,6 +13,14 @@ public class SeatingTier {
         this.perks = perks;
     }
 
+    public double getPrice() {
+        return price;
+    }
+
+    public String getPerks() {
+        return perks;
+    }
+
     public String getTierName() {
         return tierName;
     }
