@@ -42,7 +42,7 @@ public class EmailSender {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject("Your Concert Ticket - " + ticketID);
 
-            // Email body (HTML for better formatting)
+            // Email body (HTML)
             MimeBodyPart htmlPart = new MimeBodyPart();
             String htmlContent = String.format(
                     "<html>" +
