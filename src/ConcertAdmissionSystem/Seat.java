@@ -1,47 +1,30 @@
 package ConcertAdmissionSystem;
 
+import java.time.LocalDate;
+
 public class Seat {
-    private final String seatNumber;
-    private final String row;
+    private String seatNumber;
+    private String row;
     private boolean isTaken;
     private SeatingTier tier;
 
-    public Seat(SeatingTier tier, String seatNumber, String row) {
+    public Seat(double price, Concert concert, SeatingTier seating, Seat seat, LocalDate timeBought, String tierName, double basePrice, String perks, int maxCapacity, int currentSold, String seatNumber, String row, boolean isTaken, SeatingTier tier) {
 //        super(price, concert, seating, seat, timeBought, tierName, basePrice, perks, maxCapacity, currentSold);
         this.seatNumber = seatNumber;
         this.row = row;
-        this.isTaken = false;
+        this.isTaken = isTaken;
         this.tier = tier;
     }
 
-    public String getSeatNumber() {
-        return seatNumber;
-    }
-
-    public String getRow() {
-        return row;
-    }
-
-    public boolean isTaken() {
-        return isTaken;
-    }
-
-    public SeatingTier getTier() {
-        return tier;
-    }
-
-    public void markAsTaken(){
-        if(isTaken) {
-            throw new IllegalStateException("Seat " + seatNumber + " is already taken");
-        }
+    void markAsTaken(){
         isTaken = true;
     }
 
-    public boolean isAvailable(){
-        return !isTaken;
+    boolean isAvailable(){
+        return false;
     }
 
-    public String getSeatInfo() {
+    String getSeatInfo() {
         return "Row " + row + ", Seat " + seatNumber + " [" + tier.getTierInfo() + "] - " + (isTaken ? "Taken" : "Available");
     }
 

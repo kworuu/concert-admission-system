@@ -1,22 +1,24 @@
 package ConcertAdmissionSystem;
 
+import java.time.LocalDate;
+
 public class SeatingTier {
     private String tierName;
-    private String perks;
     private double price;
+    private String perks;
+    private int maxCapacity;
 
-    public SeatingTier(String tierName, double price, String perks) {
+    public SeatingTier(String tierName, double price, String perks, int maxCapacity) {
         this.tierName = tierName;
         this.price = price;
         this.perks = perks;
+        this.maxCapacity = maxCapacity;
     }
 
-    public double getPrice() {
-        return price;
-    }
-
-    public String getPerks() {
-        return perks;
+    public SeatingTier(String tierName, double basePrice, String perks) {
+        this.tierName = tierName;
+        this.price = price;
+        this.perks = perks;
     }
 
     public String getTierName() {
