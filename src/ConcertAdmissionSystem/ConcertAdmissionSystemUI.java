@@ -270,39 +270,69 @@ public class ConcertAdmissionSystemUI extends JFrame {
         int response = JOptionPane.showConfirmDialog(this, "Confirm purchase for seat?", "Confirm", JOptionPane.YES_NO_OPTION);
 
         if (response == JOptionPane.YES_OPTION) {
-            // **FIRST: Get the seat number BEFORE changing the text**
-            String actualSeatNumber = selectedSeat.getText(); // e.g., "VVA1", "vB2", etc.
+            // GET SEAT NUMBER BEFORE CHANGING TEXT
+            String actualSeatNumber = selectedSeat.getText();
 
-            // Determine which tier this seat belongs to
-            String tier = "";
+            // DETERMINE TIER AND PRICE
+            String tierName = "";
+            double price = 0.00;
+            SeatingTier seatingTier = null;
+
             if (vvip_buttons.contains(selectedSeat)) {
-                tier = "VVIP";
+                tierName = "VVIP";
+                price = 600.00;
+                seatingTier = new SeatingTier(tierName, price, "Backstage Pass");
             } else if (vip_buttons.contains(selectedSeat)) {
-                tier = "VIP";
+                tierName = "VIP";
+                price = 450.00;
+                seatingTier = new SeatingTier(tierName, price, "Free Pass");
             } else if (generalAdmission_buttons.contains(selectedSeat)) {
-                tier = "General Admission";
+                tierName = "General Admission";
+                price = 200.00;
+                seatingTier = new SeatingTier(tierName, price, "~none");
             }
 
-            // NOW update the button appearance
+            // Extract row from seat number (e.g., "VVA1" -> row "A")
+            String row = actualSeatNumber.substring(0, actualSeatNumber.length() - 1);
+            Seat seat = new Seat(actualSeatNumber, row, seatingTier);
+
+            // Get the selected concert
+            String selectedConcertName = (String) cmbox_selectConcert.getSelectedItem();
+            Concert selectedConcert = null;
+            for (Concert c : availableConcerts) {
+                if (c.getConcertName().equals(selectedConcertName)) {
+                    selectedConcert = c;
+                    break;
+                }
+            }
+
+            // CREATE THE TICKET OBJECT
+            Ticket ticket = new Ticket(customer, price, selectedConcert, seatingTier, seat);
+
+            // CUSTOMER BUYS THE TICKET (SAVES TO CSV)
+            customer.buyTicket(ticket);
+
+            // UPDATE UI
             selectedSeat.setText("TAKEN");
             selectedSeat.setBackground(COLOR_SOLD);
             selectedSeat.setForeground(Color.WHITE);
             selectedSeat.setOpaque(true);
             selectedSeat.setBorderPainted(false);
 
-            // Update progress bar counter
+            // UPDATE PROGRESS BAR
             soldSeats++;
             progressBar1.setValue(soldSeats);
             progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
 
-            // clear the selection variable for the next person
+            // CLEAR FORM
             selectedSeat = null;
             selectedSeatLabel.setText("~none");
             priceLabel.setText("PHP 0.00");
             enterFullNameTextField.setText("");
             enterEmailAddressTextField.setText("");
             enterAgeTextField.setText("");
-            JOptionPane.showMessageDialog(this, "Ticket Confirmed!");
+
+            JOptionPane.showMessageDialog(this, "Ticket Confirmed!\nTicket ID: " + ticket.getTicketID());
         }
     }
 
@@ -475,32 +505,30 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
     // NEW METHOD: Reads the CSV and updates the UI
     public void loadInfo() {
-        // 1. Get the list of taken seats from the CSV
+        // 1. Get the count from CSV FIRST
+        soldSeats = TicketManager.getSoldTicketCount();
+
+        // 2. Get the list of taken seats from the CSV
         List<String> takenSeats = TicketManager.loadSoldSeats();
 
-        // 2. Combine all buttons into one list to search them easily
+        // 3. Combine all buttons into one list to search them easily
         List<JButton> allButtons = new ArrayList<>();
         allButtons.addAll(vvip_buttons);
         allButtons.addAll(vip_buttons);
         allButtons.addAll(generalAdmission_buttons);
 
-        // 3. Loop through every button
+        // 4. Loop through every button and mark as taken
         for (JButton btn : allButtons) {
-            // If the button's text (e.g., "VVA1") is in our sold list...
             if (takenSeats.contains(btn.getText())) {
-                // ...mark it as SOLD
                 btn.setText("TAKEN");
                 btn.setBackground(COLOR_SOLD);
                 btn.setForeground(Color.WHITE);
                 btn.setOpaque(true);
                 btn.setBorderPainted(false);
-
-                // Update the counter
-                soldSeats++;
             }
         }
 
-        // 4. Update the progress bar to show the correct count
+        // 5. Update the progress bar with the correct count from CSV
         progressBar1.setValue(soldSeats);
         progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
     }
