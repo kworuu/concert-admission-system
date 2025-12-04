@@ -12,15 +12,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/javax.mail-api-1.6.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/itextpdf-5.5.13.3.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -40,6 +31,24 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/javase-3.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/javax.mail-1.6.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/activation-1.1.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
