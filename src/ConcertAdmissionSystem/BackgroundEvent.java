@@ -7,6 +7,7 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import java.io.IOException;
+import java.net.URL;
 
 public class BackgroundEvent extends PdfPageEventHelper {
 
@@ -26,27 +27,20 @@ public class BackgroundEvent extends PdfPageEventHelper {
             canvas.saveState();
 
             // 2. Determine the path for the correct image
-            String imagePath = determineImagePath(this.ticketType);
+            String filename = determineImageName(this.ticketType);
 
             // 3. Load the Image instance from the file path
-            // Note: If you have issues loading from a path, ensure the path is an absolute file path,
-            // not just a directory name.
-            Image background = Image.getInstance(imagePath);
+            Image background = loadImageFromResources(filename);
 
-            // 4. Scale and Position the Image to fit the page exactly
-
+            // 4. Size & position
             float documentWidth = document.getPageSize().getWidth();
             float documentHeight = document.getPageSize().getHeight();
 
             // Set the bottom-left corner of the image to the bottom-left corner of the page (0, 0)
             background.setAbsolutePosition(0, 0);
-
-            // Scale the image to cover the entire page area
             background.scaleAbsolute(documentWidth, documentHeight);
 
-            // 5. Add the image to the background canvas
             canvas.addImage(background);
-
             canvas.restoreState();
 
         } catch (IOException | DocumentException e) {
@@ -59,24 +53,29 @@ public class BackgroundEvent extends PdfPageEventHelper {
     /**
      * Maps the ticket type string to the local file path of the corresponding image.
      */
-    private String determineImagePath(String type) {
+    private String determineImageName(String type) {
         // Normalize the type string for reliable comparison
         String normalizedType = type.toUpperCase().trim();
 
-        // **!!! CRITICAL: FILE PATH CORRECTION !!!**
-        // A path like "C:\\Users\\allea\\Downloads" is a directory, not a file.
-        // You MUST append the actual file name (e.g., GEN-ADD.jpg) to the directory.
-        String baseDir = "C:\\Users\\allea\\Downloads\\TicketTier\\"; // Ensure this directory exists and images are here
-
         switch (normalizedType) {
-
             case "VIP":
-                return baseDir + "VIP.png";
+                return "VIP.png";
             case "VVIP":
-                return baseDir + "VVIP.png";
+                return "VVIP.png";
             default:
                 // for GenADD BG
-                return baseDir + "GEN-ADD.png";
+                return "GEN-ADD.png";
         }
+    }
+
+    private Image loadImageFromResources(String filename) throws IOException, DocumentException {
+        String resourcePath = "/assets/ticket-background/" + filename;
+        URL resourceUrl = getClass().getResource(resourcePath);
+
+        if(resourceUrl == null) {
+            throw new IOException("Image not found in resources: " + resourcePath);
+        }
+
+        return Image.getInstance(resourceUrl);
     }
 }
