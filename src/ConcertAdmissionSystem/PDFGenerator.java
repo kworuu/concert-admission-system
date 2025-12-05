@@ -114,6 +114,29 @@ public class PDFGenerator {
             );
             canvas.endText();
 
+            // --- 5. Rotated TicketID (SEAT NUM STYLED FIX) ---
+
+            // Define the font for the rotated seat number (REQUIRED FIX)
+            BaseFont bfSeatID = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
+            canvas.setFontAndSize(bfSeatID, 5); // Set a clear font size
+            canvas.setColorFill(BaseColor.BLACK); // Ensure color is set
+
+            // Coordinates for the lower position (from Y=0.65in)
+
+
+            float TcenterX = 541.50f; // Midpoint X
+            float TcenterY = 87f; // Midpoint Y
+
+            // Draw the text directly onto the canvas with rotation
+            canvas.beginText();
+            canvas.showTextAligned(
+                    Element.ALIGN_CENTER,
+                    securityHash,
+                    TcenterX,
+                    TcenterY,
+                    90f
+            );
+            canvas.endText();
 
 
 
