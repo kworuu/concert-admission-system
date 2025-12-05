@@ -66,7 +66,7 @@ public class BackgroundEvent extends PdfPageEventHelper {
         // **!!! CRITICAL: FILE PATH CORRECTION !!!**
         // A path like "C:\\Users\\allea\\Downloads" is a directory, not a file.
         // You MUST append the actual file name (e.g., GEN-ADD.jpg) to the directory.
-        String baseDir = "C:\\Users\\allea\\Downloads\\TicketTier\\"; // Ensure this directory exists and images are here
+        String baseDir = "C:\\Users\\allea\\IdeaProjects\\concert-admission-system2\\TicketTier\\"; // Ensure this directory exists and images are here
 
         switch (normalizedType) {
 
