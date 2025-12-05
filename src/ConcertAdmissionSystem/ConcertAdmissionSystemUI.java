@@ -116,7 +116,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private final Color COLOR_SOLD = Color.RED;
 
     // Capacity
-    private final int maximumCapacity = 70;
+    private final int maximumCapacity = 60;
     private int soldSeats = 0;
 
     public ConcertAdmissionSystemUI() {
