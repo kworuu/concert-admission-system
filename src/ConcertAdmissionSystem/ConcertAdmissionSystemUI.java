@@ -335,9 +335,8 @@ public class ConcertAdmissionSystemUI extends JFrame {
         double price = (Double) seatDetails[1];
         String perks = (String) seatDetails[2];
         String row = String.valueOf(actualSeatIdentifier.charAt(0));
-        String seatNumber = actualSeatIdentifier.substring(1);
         SeatingTier tierObject = new SeatingTier(tierName, price, perks);
-        Seat seat = new Seat(seatNumber, row, tierObject);
+        Seat seat = new Seat(actualSeatIdentifier, row, tierObject);
         seat.markAsTaken();
         Ticket finalTicket = new Ticket(customer, price, selectedConcert, tierObject, seat);
         String ticketID = finalTicket.getTicketID();
@@ -578,36 +577,53 @@ public class ConcertAdmissionSystemUI extends JFrame {
         panelInsideScroll.repaint();
     }
 
-    // NEW METHOD: Reads the CSV and updates the UI
     public void loadInfo() {
         // 1. Get the list of taken seats from the CSV
         List<String> takenSeats = TicketManager.loadSoldSeats();
 
-        // 2. Combine all buttons into one list to search them easily
+        // Debugging: Print to console so you can see what is happening
+        System.out.println("DEBUG: Loaded " + takenSeats.size() + " seats from CSV.");
+
+        // 2. Combine all buttons
         List<JButton> allButtons = new ArrayList<>();
         allButtons.addAll(vvip_buttons);
         allButtons.addAll(vip_buttons);
         allButtons.addAll(generalAdmission_buttons);
 
-        // 3. Loop through every button
+        // 3. Reset counter
+        soldSeats = 0;
+
+        // 4. Iterate and Update
         for (JButton btn : allButtons) {
-            // If the button's text (e.g., "VVA1") is in our sold list...
+            // Check if the button's text (e.g., "VV-A1") is in the list
             if (takenSeats.contains(btn.getText())) {
-                // ...mark it as SOLD
+
+                System.out.println("DEBUG: Marking " + btn.getText() + " as TAKEN.");
+
+                // VISUAL UPDATES
                 btn.setText("TAKEN");
                 btn.setBackground(COLOR_SOLD);
                 btn.setForeground(Color.WHITE);
+
+                // Fix for specific OS (Mac/Windows) painting issues
                 btn.setOpaque(true);
+                btn.setContentAreaFilled(true);
                 btn.setBorderPainted(false);
 
-                // Update the counter
                 soldSeats++;
             }
         }
 
-        // 4. Update the progress bar to show the correct count
+        // 5. Update Progress Bar
         progressBar1.setValue(soldSeats);
         progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
+
+        // 6. FORCE REFRESH (Crucial Step)
+        // This tells Java to redraw the panel immediately
+        if (panelInsideScroll != null) {
+            panelInsideScroll.revalidate();
+            panelInsideScroll.repaint();
+        }
     }
 
     public static boolean isValidEmail(String email){
