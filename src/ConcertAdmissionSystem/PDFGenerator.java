@@ -1,72 +1,126 @@
 package ConcertAdmissionSystem;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.PageSize;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Element;
-import java.io.File;           // ADDED: For file path
-import java.io.FileOutputStream; // ADDED: For writing to disk
+import com.itextpdf.text.pdf.BaseFont; // <-- ADDED: Needed for direct canvas font setting
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
-// Removed: java.io.ByteArrayOutputStream (no longer needed)
+import java.io.IOException; // <-- ADDED: Needed for BaseFont.createFont
 
 public class PDFGenerator {
 
-    /**
-     * Generates the concert ticket PDF from a Ticket object, writes it to disk,
-     * and returns the absolute file path.
-     *
-     * @param ticket The complete Ticket object to extract data from.
-     * @return The String (absolute path) of the generated PDF file.
-     * @throws RuntimeException if the PDF generation or writing fails.
-     */
-    public String generateTicket(Ticket ticket) { // <--- RETURN TYPE IS NOW String
-
-        // 1. Extract necessary data from the Ticket object
+    public String generateTicket(Ticket ticket) {
+        // 1. Extract necessary data (including the ticket type)
         String name = ticket.getCustomer().getName();
-        // Use getSeatInfo() which provides a good summary
-        String seatInfo = ticket.getSeat().getSeatInfo();
-        String concertName = ticket.getConcert().getConcertName();
+        String seatRow = ticket.getSeat().getRow();
+        String seatNum = ticket.getSeat().getSeatNumber();
         String securityHash = ticket.getTicketID();
+        String concertName = ticket.getConcert().getConcertName(); // Added to match original extract list
+        String ticketType = ticket.getSeating().getTierName();
 
         // 2. Define the output file path/name
-        // Use the system's temporary directory for a reliable save location
         String tempDir = System.getProperty("java.io.tmpdir");
         String filename = "Ticket_" + securityHash + ".pdf";
         File file = new File(tempDir, filename);
-        String absolutePath = file.getAbsolutePath(); // This is the path we must return
+        String absolutePath = file.getAbsolutePath();
 
-        Document document = new Document(PageSize.A4);
+        // Customize size for pdf
+        Rectangle customSize = new Rectangle(612f, 198f);
+        Document document = new Document(customSize);
+        PdfWriter writer = null;
 
         try {
-            // 3. Write PDF directly to the file on disk using the absolute path
-            PdfWriter.getInstance(document, new FileOutputStream(absolutePath));
+            writer = PdfWriter.getInstance(document, new FileOutputStream(absolutePath));
+
+            // Set the PageEvent (BackgroundEvent class is assumed to exist)
+            BackgroundEvent backgroundEvent = new BackgroundEvent(ticketType);
+            writer.setPageEvent(backgroundEvent);
+
             document.open();
+            PdfContentByte canvas = writer.getDirectContent();
+            ColumnText ct;
 
-            // --- Add Content to the PDF using extracted data ---
+            // --- 1. WildCats Concert Name (Static Header) ---
+            ct = new ColumnText(canvas);
+            Font WildcatsPub = new Font(Font.FontFamily.HELVETICA, 40f, Font.UNDEFINED, BaseColor.WHITE);
+            Paragraph concertHeader = new Paragraph("WildCats", WildcatsPub);
+            ct.setSimpleColumn(concertHeader, 20.16f, 21.76f, 300f, 135f, 10f, Element.ALIGN_LEFT);
+            ct.go();
 
-            Paragraph title = new Paragraph("🎫 CONCERT ADMISSION TICKET 🎫");
-            title.setAlignment(Element.ALIGN_CENTER);
-            title.setSpacingAfter(20);
-            document.add(title);
-
-            document.add(new Paragraph("Concert: " + concertName));
-            document.add(new Paragraph("Ticket Holder: " + name));
-            document.add(new Paragraph("Seat Details: " + seatInfo));
-            // Ensure the price formatting matches your system's currency (PHP)
-            document.add(new Paragraph("Price: PHP " + String.format("%.2f", ticket.getPrice())));
-
-            document.add(new Paragraph("\n"));
-            document.add(new Paragraph("Ticket ID: " + securityHash));
-            document.add(new Paragraph("\n"));
-            document.add(new Paragraph("Perks: " + ticket.getSeating().getPerks()));
+            // --- 2. WildCats Concert Name (Static Header) ---
+            ct = new ColumnText(canvas);
+            Font Pub = new Font(Font.FontFamily.HELVETICA, 40f, Font.UNDEFINED, BaseColor.WHITE);
+            Paragraph PubHeader = new Paragraph("Pub", WildcatsPub);
+            ct.setSimpleColumn(PubHeader, 20.16f, 21.76f, 300f, 90f, 10f, Element.ALIGN_LEFT);
+            ct.go();
 
 
-        } catch (FileNotFoundException | DocumentException e) {
+            // --- 3. Rotated Seat Row (SEAT NUM STYLED FIX) ---
+
+            // Define the font for the rotated seat number (REQUIRED FIX)
+            BaseFont bfSeatRow = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
+            canvas.setFontAndSize(bfSeatRow, 19); // Set a clear font size
+            canvas.setColorFill(BaseColor.BLACK); // Ensure color is set
+
+            // Coordinates for the lower position (from Y=0.65in)
+            float Rllx = 574.56f;
+            float Rlly = 100.8f;
+            float Rurx = 601.92f;
+            float Rury = 100.23f; // Corrected from 69.23f (was a slight calculation error)
+
+            float RcenterX = ((Rllx + Rurx) / 2f) ; // Midpoint X
+            float RcenterY = ((Rlly + Rury) / 2f) ; // Midpoint Y
+
+            // Draw the text directly onto the canvas with rotation
+            canvas.beginText();
+            canvas.showTextAligned(
+                    Element.ALIGN_CENTER,
+                    seatRow,
+                    RcenterX,
+                    RcenterY,
+                    90f
+            );
+            canvas.endText();
+
+
+            // --- 4. Rotated Seat Number (SEAT NUM STYLED FIX) ---
+
+            // Define the font for the rotated seat number (REQUIRED FIX)
+            BaseFont bfSeatNum = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
+            canvas.setFontAndSize(bfSeatNum, 19); // Set a clear font size
+            canvas.setColorFill(BaseColor.BLACK); // Ensure color is set
+
+            // Coordinates for the lower position (from Y=0.65in)
+            float llx = 574.56f;
+            float lly = 163.8f;
+            float urx = 601.92f;
+            float ury = 163.23f; // Corrected from 69.23f (was a slight calculation error)
+
+            float centerX = (llx + urx) / 2f; // Midpoint X
+            float centerY = (lly + ury) / 2f; // Midpoint Y
+
+            // Draw the text directly onto the canvas with rotation
+            canvas.beginText();
+            canvas.showTextAligned(
+                    Element.ALIGN_CENTER,
+                    seatNum,
+                    centerX,
+                    centerY,
+                    90f
+            );
+            canvas.endText();
+
+
+
+
+        } catch (DocumentException | IOException e) {
+            // Added IOException for BaseFont.createFont
             System.err.println("CRITICAL ERROR: Failed to initialize or write to PDF document.");
             e.printStackTrace();
-            // Wrap in RuntimeException to match the previous error handling style
             throw new RuntimeException("Failed to generate PDF ticket due to document error.", e);
 
         } finally {
@@ -75,7 +129,6 @@ public class PDFGenerator {
             }
         }
 
-        // CRITICAL: Return the absolute path of the file that was created
         return absolutePath;
     }
 }
