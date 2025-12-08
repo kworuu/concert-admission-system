@@ -10,7 +10,7 @@ public class EmailSender {
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
     private static final String SENDER_EMAIL = "wildcatsadmissionsystem@gmail.com";
-    private static final String SENDER_PASSWORD = "cirwwhceqgtbmjsv"; // Use App Password, not regular password!
+    private static final String SENDER_PASSWORD = "cirwwhceqgtbmjsv"; // App password for email
 
     /**
      * Sends ticket email with PDF attachment
@@ -97,40 +97,6 @@ public class EmailSender {
 
         } catch (Exception e) {
             System.err.println("Error sending email: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Simple email without attachment (for notifications)
-     */
-    public static boolean sendSimpleEmail(String recipientEmail, String subject, String body) {
-        Properties props = new Properties();
-        props.put("mail.smtp.host", SMTP_HOST);
-        props.put("mail.smtp.port", SMTP_PORT);
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-
-        Session session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(SENDER_EMAIL, SENDER_PASSWORD);
-            }
-        });
-
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(SENDER_EMAIL, "WildCats Pub"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject(subject);
-            message.setText(body);
-
-            Transport.send(message);
-            return true;
-
-        } catch (Exception e) {
-            System.err.println("Error sending simple email: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
