@@ -3,13 +3,16 @@ package ConcertAdmissionSystem;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
 
 public class ConcertAdmissionSystemUI extends JFrame {
     private JPanel contentpane;
@@ -113,7 +116,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private final Color COLOR_SOLD = Color.RED;
 
     // Capacity
-    private final int maximumCapacity = 70;
+    private final int maximumCapacity = 60;
     private int soldSeats = 0;
 
     public ConcertAdmissionSystemUI() {
@@ -255,56 +258,157 @@ public class ConcertAdmissionSystemUI extends JFrame {
         }
     }
 
+    // --- START OF NEW METHODS TO ADD/REPLACE IN ConcertAdmissionSystemUI.java ---
+
+    /**
+     * Gets the currently selected Concert object from the list.
+     */
+    private Concert getSelectedConcert() {
+        String selectedName = (String) cmbox_selectConcert.getSelectedItem();
+        if (selectedName != null && availableConcerts != null) {
+            for (Concert concert : availableConcerts) {
+                if (concert.getConcertName().equals(selectedName)) {
+                    return concert;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Generates a unique ticket ID.
+     */
+    private String generateUniqueTicketID() {
+        // Generates a simple ID based on current time
+        return "WC" + System.currentTimeMillis() % 1000000;
+    }
+
+    /**
+     * Attempts to parse the seat details (Tier Name, Price, and Perks) from the clicked button.
+     * @param button The clicked seat button (e.g., VVA1)
+     * @return A temporary array/object containing [Tier Name (String), Price (Double), Perks (String)].
+     */
+    private Object[] getSeatDetailsFromButton(JButton button) {
+        String tierName = "";
+        double price = 0.0;
+        String perks = "";
+
+        if (vvip_buttons.contains(button)) {
+            tierName = "VVIP";
+            price = 600.00;
+            perks = "Backstage Pass";
+        } else if (vip_buttons.contains(button)) {
+            tierName = "VIP";
+            price = 450.00;
+            perks = "Free Table";
+        } else if (generalAdmission_buttons.contains(button)) {
+            tierName = "General Admission";
+            price = 200.00;
+            perks = "~none";
+        }
+
+        return new Object[]{tierName, price, perks};
+    }
+
+    /**
+     * Orchestrates the full purchase process, including validation, ticket object creation,
+     * PDF generation (via EmailSender), email sending, and final UI update.
+     */
+    // Inside ConcertAdmissionSystemUI.java, replace the old confirmPurchase method:
     public void confirmPurchase() {
         if (selectedSeat == null) {
             JOptionPane.showMessageDialog(this, "Please select a seat first.", "Missing Input", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
+        // 1-6. Validation, gathering details, and creating Ticket object (NO CHANGE)
         Customer customer = createCustomerFromInput();
-        if (customer == null) {
-            return; // validation failed, stop
+        if (customer == null) { return; }
+        Concert selectedConcert = getSelectedConcert();
+        if (selectedConcert == null) {
+            JOptionPane.showMessageDialog(this, "No concert is selected or loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+        String actualSeatIdentifier = selectedSeat.getText();
+        Object[] seatDetails = getSeatDetailsFromButton(selectedSeat);
+        String tierName = (String) seatDetails[0];
+        double price = (Double) seatDetails[1];
+        String perks = (String) seatDetails[2];
+        String row = String.valueOf(actualSeatIdentifier.charAt(0));
+        SeatingTier tierObject = new SeatingTier(tierName, price, perks);
+        Seat seat = new Seat(actualSeatIdentifier, row, tierObject);
+        seat.markAsTaken();
+        Ticket finalTicket = new Ticket(customer, price, selectedConcert, tierObject, seat);
+        String ticketID = finalTicket.getTicketID();
 
-        // SUCCESSFUL VALIDATION LOGIC
-        int response = JOptionPane.showConfirmDialog(this, "Confirm purchase for seat?", "Confirm", JOptionPane.YES_NO_OPTION);
+        // 7. Confirmation Dialogue
+        int response = JOptionPane.showConfirmDialog(this,
+                String.format("Confirm purchase:\nName: %s\nSeat: %s (%s)\nPrice: PHP %.2f\nPerks: %s\nTicket ID: %s",
+                        customer.getName(), actualSeatIdentifier, tierName, price, perks, ticketID),
+                "Confirm Ticket Purchase", JOptionPane.YES_NO_OPTION);
 
         if (response == JOptionPane.YES_OPTION) {
-            // **FIRST: Get the seat number BEFORE changing the text**
-            String actualSeatNumber = selectedSeat.getText(); // e.g., "VVA1", "vB2", etc.
 
-            // Determine which tier this seat belongs to
-            String tier = "";
-            if (vvip_buttons.contains(selectedSeat)) {
-                tier = "VVIP";
-            } else if (vip_buttons.contains(selectedSeat)) {
-                tier = "VIP";
-            } else if (generalAdmission_buttons.contains(selectedSeat)) {
-                tier = "General Admission";
+            // 8. Generate PDF File and Get Path (SIMPLIFIED!)
+            PDFGenerator generator = new PDFGenerator();
+            String pdfPath;
+
+            try {
+                // Directly calls PDFGenerator and gets the file path (String)
+                pdfPath = generator.generateTicket(finalTicket);
+            } catch (RuntimeException e) {
+                JOptionPane.showMessageDialog(this, "Critical Error: Failed to generate or save PDF ticket.", "PDF Error", JOptionPane.ERROR_MESSAGE);
+                return; // Stop the purchase process
             }
 
-            // NOW update the button appearance
-            selectedSeat.setText("TAKEN");
-            selectedSeat.setBackground(COLOR_SOLD);
-            selectedSeat.setForeground(Color.WHITE);
-            selectedSeat.setOpaque(true);
-            selectedSeat.setBorderPainted(false);
+            // 9. Call EmailSender with the file path
+            boolean emailSent = EmailSender.sendTicketEmail(
+                    customer.getEmail(),
+                    pdfPath, // String: path to the saved PDF file
+                    customer.getName(),
+                    ticketID
+            );
 
-            // Update progress bar counter
-            soldSeats++;
-            progressBar1.setValue(soldSeats);
-            progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
+            // 10. Finalize Transaction, UI Update, and Cleanup
+            if (emailSent) {
+                finalTicket.saveToFile();
 
-            // clear the selection variable for the next person
-            selectedSeat = null;
-            selectedSeatLabel.setText("~none");
-            priceLabel.setText("PHP 0.00");
-            enterFullNameTextField.setText("");
-            enterEmailAddressTextField.setText("");
-            enterAgeTextField.setText("");
-            JOptionPane.showMessageDialog(this, "Ticket Confirmed!");
+                // Update UI visually (Existing logic)
+                selectedSeat.setText("TAKEN");
+                selectedSeat.setBackground(COLOR_SOLD);
+                selectedSeat.setForeground(Color.WHITE);
+                selectedSeat.setOpaque(true);
+                selectedSeat.setBorderPainted(false);
+                soldSeats++;
+                progressBar1.setValue(soldSeats);
+                progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
+                selectedSeat = null;
+                selectedSeatLabel.setText("~none");
+                priceLabel.setText("PHP 0.00");
+                enterFullNameTextField.setText("");
+                enterEmailAddressTextField.setText("");
+                enterAgeTextField.setText("");
+
+                JOptionPane.showMessageDialog(this, "✅ Success! Ticket Confirmed and Emailed to " + customer.getEmail() + ".\nTicket ID: " + ticketID, "Purchase Complete", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                // Handle Email Failure
+                JOptionPane.showMessageDialog(this,
+                        "⚠️ Warning! The seat was reserved, but the email failed to send. Check the console for JavaMail errors.\nSeat remains SELECTED. Please contact support or retry the purchase.",
+                        "Email Failure", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // 11. Clean up the temporary PDF file (CRITICAL STEP)
+            if (pdfPath != null) {
+                try {
+                    // Ensure java.io.File is imported
+                    new File(pdfPath).delete();
+                } catch (Exception fileCleanupException) {
+                    // Ignore failure to delete the temp file
+                }
+            }
         }
     }
+// --- END OF NEW METHODS ---
 
     public void resetSeatColor(JButton btn) {
         if (vvip_buttons.contains(btn)) {
@@ -473,36 +577,53 @@ public class ConcertAdmissionSystemUI extends JFrame {
         panelInsideScroll.repaint();
     }
 
-    // NEW METHOD: Reads the CSV and updates the UI
     public void loadInfo() {
         // 1. Get the list of taken seats from the CSV
         List<String> takenSeats = TicketManager.loadSoldSeats();
 
-        // 2. Combine all buttons into one list to search them easily
+        // Debugging: Print to console so you can see what is happening
+        System.out.println("DEBUG: Loaded " + takenSeats.size() + " seats from CSV.");
+
+        // 2. Combine all buttons
         List<JButton> allButtons = new ArrayList<>();
         allButtons.addAll(vvip_buttons);
         allButtons.addAll(vip_buttons);
         allButtons.addAll(generalAdmission_buttons);
 
-        // 3. Loop through every button
+        // 3. Reset counter
+        soldSeats = 0;
+
+        // 4. Iterate and Update
         for (JButton btn : allButtons) {
-            // If the button's text (e.g., "VVA1") is in our sold list...
+            // Check if the button's text (e.g., "VV-A1") is in the list
             if (takenSeats.contains(btn.getText())) {
-                // ...mark it as SOLD
+
+                System.out.println("DEBUG: Marking " + btn.getText() + " as TAKEN.");
+
+                // VISUAL UPDATES
                 btn.setText("TAKEN");
                 btn.setBackground(COLOR_SOLD);
                 btn.setForeground(Color.WHITE);
+
+                // Fix for specific OS (Mac/Windows) painting issues
                 btn.setOpaque(true);
+                btn.setContentAreaFilled(true);
                 btn.setBorderPainted(false);
 
-                // Update the counter
                 soldSeats++;
             }
         }
 
-        // 4. Update the progress bar to show the correct count
+        // 5. Update Progress Bar
         progressBar1.setValue(soldSeats);
         progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
+
+        // 6. FORCE REFRESH (Crucial Step)
+        // This tells Java to redraw the panel immediately
+        if (panelInsideScroll != null) {
+            panelInsideScroll.revalidate();
+            panelInsideScroll.repaint();
+        }
     }
 
     public static boolean isValidEmail(String email){

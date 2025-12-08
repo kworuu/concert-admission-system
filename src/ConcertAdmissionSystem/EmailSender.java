@@ -9,8 +9,8 @@ public class EmailSender {
     // Email configuration - should be in a config file in production
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
-    private static final String SENDER_EMAIL = "youremail@gmail.com";
-    private static final String SENDER_PASSWORD = "your-app-password"; // Use App Password, not regular password!
+    private static final String SENDER_EMAIL = "wildcatsadmissionsystem@gmail.com";
+    private static final String SENDER_PASSWORD = "cirwwhceqgtbmjsv"; // Use App Password, not regular password!
 
     /**
      * Sends ticket email with PDF attachment
