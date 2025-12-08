@@ -14,12 +14,11 @@ import java.io.IOException; // <-- ADDED: Needed for BaseFont.createFont
 public class PDFGenerator {
 
     public String generateTicket(Ticket ticket) {
-        // 1. Extract necessary data (including the ticket type)
-        String name = ticket.getCustomer().getName();
+        // Data
+
         String seatRow = ticket.getSeat().getRow();
         String seatNum = ticket.getSeat().getSeatNumber();
         String securityHash = ticket.getTicketID();
-        String concertName = ticket.getConcert().getConcertName(); // Added to match original extract list
         String ticketType = ticket.getSeating().getTierName();
 
         // 2. Define the output file path/name
@@ -36,7 +35,7 @@ public class PDFGenerator {
         try {
             writer = PdfWriter.getInstance(document, new FileOutputStream(absolutePath));
 
-            // Set the PageEvent (BackgroundEvent class is assumed to exist)
+            // Set the PageEvent
             BackgroundEvent backgroundEvent = new BackgroundEvent(ticketType);
             writer.setPageEvent(backgroundEvent);
 
@@ -51,7 +50,7 @@ public class PDFGenerator {
             ct.setSimpleColumn(concertHeader, 20.16f, 21.76f, 300f, 135f, 10f, Element.ALIGN_LEFT);
             ct.go();
 
-            // --- 2. WildCats Concert Name (Static Header) ---
+            // --- 2. Pub Concert Name (Static Header) ---
             ct = new ColumnText(canvas);
             Font Pub = new Font(Font.FontFamily.HELVETICA, 40f, Font.UNDEFINED, BaseColor.WHITE);
             Paragraph PubHeader = new Paragraph("Pub", WildcatsPub);
@@ -59,9 +58,7 @@ public class PDFGenerator {
             ct.go();
 
 
-            // --- 3. Rotated Seat Row (SEAT NUM STYLED FIX) ---
-
-            // Define the font for the rotated seat number (REQUIRED FIX)
+            // --- 3. Rotated Seat Row ---
             BaseFont bfSeatRow = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
             canvas.setFontAndSize(bfSeatRow, 19); // Set a clear font size
             canvas.setColorFill(BaseColor.BLACK); // Ensure color is set
