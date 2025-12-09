@@ -102,8 +102,10 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private final List<JButton> vip_buttons = new ArrayList<>();
     private final List<JButton> generalAdmission_buttons = new ArrayList<>();
 
+    private ConcertManager concertManager;
     private List<Concert> availableConcerts;
 
+    private String currentConcertName;
 
     // Local Variables
     private JButton selectedSeat = null;
@@ -125,6 +127,8 @@ public class ConcertAdmissionSystemUI extends JFrame {
         setContentPane(contentpane);
         pack();
         setLocationRelativeTo(null);
+
+        concertManager = new ConcertManager();
 
         // Set the detail fields to read-only
         details_concertDate.setEditable(false);
@@ -148,14 +152,19 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
                 // Find the corresponding Concert object in your list
                 if (selectedName != null) {
-                    for (Concert concert : availableConcerts) {
-                        if (concert.getConcertName().equals(selectedName)) {
-                            loadConcertDetails(concert); // Update the details panel
-                            // loadInfo(); // You would call loadInfo() here to refresh sold seats
-                            break;
-                        }
+                    Concert concert = concertManager.getConcertByTitle(selectedName);
+                    if(concert != null) {
+                        loadConcertDetails(concert);
                     }
                 }
+//                    for (Concert concert : availableConcerts) {
+//                        if (concert.getConcertName().equals(selectedName)) {
+//                            loadConcertDetails(concert); // Update the details panel
+//                            // loadInfo(); // You would call loadInfo() here to refresh sold seats
+//                            break;
+//                        }
+//                    }
+//                }
             }
         });
 
@@ -198,18 +207,35 @@ public class ConcertAdmissionSystemUI extends JFrame {
                 handleSeatSelection(clickedButton);
             }
         };
-            for (JButton btn : vvip_buttons) {
-                btn.setBackground(COLOR_VVIP);
+
+        // Helper to initialize button properties
+        List<List<JButton>> allTiers = Arrays.asList(vvip_buttons, vip_buttons, generalAdmission_buttons);
+        Color[] tierColors = {COLOR_VVIP, COLOR_VIP, COLOR_GEN};
+
+        for (int i = 0; i < allTiers.size(); i++) {
+            List<JButton> buttons = allTiers.get(i);
+            Color color = tierColors[i];
+
+            for (JButton btn : buttons) {
+                // Set the initial seat identifier as the button's text.
+                // This relies on the button having its `name` property set in the GUI designer
+                // (e.g., VVA1Button) and then using that name minus "Button".
+                String buttonName = btn.getName();
+                if (buttonName != null && buttonName.endsWith("Button")) {
+                    btn.setText(buttonName.substring(0, buttonName.length() - 6));
+                } else {
+                    // Fallback for buttons without a name property (less ideal)
+                    btn.setText("Seat");
+                }
+
+                btn.setBackground(color);
                 btn.addActionListener(seatListener);
+                btn.setForeground(Color.BLACK); // Default text color
+                btn.setOpaque(true);
+                btn.setContentAreaFilled(true);
+                btn.setBorderPainted(true);
             }
-            for (JButton btn : vip_buttons) {
-                btn.setBackground(COLOR_VIP);
-                btn.addActionListener(seatListener);
-            }
-            for (JButton btn : generalAdmission_buttons) {
-                btn.setBackground(COLOR_GEN);
-                btn.addActionListener(seatListener);
-            }
+        }
     }
 
     private void handleSeatSelection(JButton clickedButton) {
@@ -371,7 +397,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
             // 10. Finalize Transaction, UI Update, and Cleanup
             if (emailSent) {
-                finalTicket.saveToFile();
+                TicketManager.saveTicket(finalTicket,currentConcertName);
 
                 // Update UI visually (Existing logic)
                 selectedSeat.setText("TAKEN");
@@ -421,89 +447,90 @@ public class ConcertAdmissionSystemUI extends JFrame {
     }
     public void groupButtons() { // groupButtons note 1 : add each individual button to its corresponding list.
         // VVIP
-        vvip_buttons.add(VVA1Button);
-        vvip_buttons.add(VVA2Button);
-        vvip_buttons.add(VVA3Button);
-        vvip_buttons.add(VVA4Button);
-        vvip_buttons.add(VVA5Button);
-        vvip_buttons.add(VVA6Button);
-        vvip_buttons.add(VVA7Button);
-        vvip_buttons.add(VVA8Button);
-        vvip_buttons.add(VVA9Button);
-        vvip_buttons.add(VVA10Button);
+        VVA1Button.setName("VVA1"); vvip_buttons.add(VVA1Button);
+        VVA2Button.setName("VVA2"); vvip_buttons.add(VVA2Button);
+        VVA3Button.setName("VVA3"); vvip_buttons.add(VVA3Button);
+        VVA4Button.setName("VVA4"); vvip_buttons.add(VVA4Button);
+        VVA5Button.setName("VVA5"); vvip_buttons.add(VVA5Button);
+        VVA6Button.setName("VVA6"); vvip_buttons.add(VVA6Button);
+        VVA7Button.setName("VVA7"); vvip_buttons.add(VVA7Button);
+        VVA8Button.setName("VVA8"); vvip_buttons.add(VVA8Button);
+        VVA9Button.setName("VVA9"); vvip_buttons.add(VVA9Button);
+        VVA10Button.setName("VVA10"); vvip_buttons.add(VVA10Button);
 
         // VIP
-        vip_buttons.add(vB1Button);
-        vip_buttons.add(vB2Button);
-        vip_buttons.add(vB3Button);
-        vip_buttons.add(vB4Button);
-        vip_buttons.add(vB5Button);
-        vip_buttons.add(vB6Button);
-        vip_buttons.add(vB7Button);
-        vip_buttons.add(vB8Button);
-        vip_buttons.add(vB9Button);
-        vip_buttons.add(vB10Button);
+        vB1Button.setName("VB1"); vip_buttons.add(vB1Button);
+        vB2Button.setName("VB2"); vip_buttons.add(vB2Button);
+        vB3Button.setName("VB3"); vip_buttons.add(vB3Button);
+        vB4Button.setName("VB4"); vip_buttons.add(vB4Button);
+        vB5Button.setName("VB5"); vip_buttons.add(vB5Button);
+        vB6Button.setName("VB6"); vip_buttons.add(vB6Button);
+        vB7Button.setName("VB7"); vip_buttons.add(vB7Button);
+        vB8Button.setName("VB8"); vip_buttons.add(vB8Button);
+        vB9Button.setName("VB9"); vip_buttons.add(vB9Button);
+        vB10Button.setName("VB10"); vip_buttons.add(vB10Button);
 
-        vip_buttons.add(vC1Button);
-        vip_buttons.add(vC2Button);
-        vip_buttons.add(vC3Button);
-        vip_buttons.add(vC4Button);
-        vip_buttons.add(vC5Button);
-        vip_buttons.add(vC6Button);
-        vip_buttons.add(vC7Button);
-        vip_buttons.add(vC8Button);
-        vip_buttons.add(vC9Button);
-        vip_buttons.add(vC10Button);
+        vC1Button.setName("VC1"); vip_buttons.add(vC1Button);
+        vC2Button.setName("VC2"); vip_buttons.add(vC2Button);
+        vC3Button.setName("VC3"); vip_buttons.add(vC3Button);
+        vC4Button.setName("VC4"); vip_buttons.add(vC4Button);
+        vC5Button.setName("VC5"); vip_buttons.add(vC5Button);
+        vC6Button.setName("VC6"); vip_buttons.add(vC6Button);
+        vC7Button.setName("VC7"); vip_buttons.add(vC7Button);
+        vC8Button.setName("VC8"); vip_buttons.add(vC8Button);
+        vC9Button.setName("VC9"); vip_buttons.add(vC9Button);
+        vC10Button.setName("VC10"); vip_buttons.add(vC10Button);
 
         // GENERAL ADMISSION
-        generalAdmission_buttons.add(gD1Button);
-        generalAdmission_buttons.add(gD2Button);
-        generalAdmission_buttons.add(gD3Button);
-        generalAdmission_buttons.add(gD4Button);
-        generalAdmission_buttons.add(gD5Button);
-        generalAdmission_buttons.add(gD6Button);
-        generalAdmission_buttons.add(gD7Button);
-        generalAdmission_buttons.add(gD8Button);
-        generalAdmission_buttons.add(gD9Button);
-        generalAdmission_buttons.add(gD10Button);
+        gD1Button.setName("GD1"); generalAdmission_buttons.add(gD1Button);
+        gD2Button.setName("GD2"); generalAdmission_buttons.add(gD2Button);
+        gD3Button.setName("GD3"); generalAdmission_buttons.add(gD3Button);
+        gD4Button.setName("GD4"); generalAdmission_buttons.add(gD4Button);
+        gD5Button.setName("GD5"); generalAdmission_buttons.add(gD5Button);
+        gD6Button.setName("GD6"); generalAdmission_buttons.add(gD6Button);
+        gD7Button.setName("GD7"); generalAdmission_buttons.add(gD7Button);
+        gD8Button.setName("GD8"); generalAdmission_buttons.add(gD8Button);
+        gD9Button.setName("GD9"); generalAdmission_buttons.add(gD9Button);
+        gD10Button.setName("GD10"); generalAdmission_buttons.add(gD10Button);
 
 
-        generalAdmission_buttons.add(gE1Button);
-        generalAdmission_buttons.add(gE2Button);
-        generalAdmission_buttons.add(gE3Button);
-        generalAdmission_buttons.add(gE4Button);
-        generalAdmission_buttons.add(gE5Button);
-        generalAdmission_buttons.add(gE6Button);
-        generalAdmission_buttons.add(gE7Button);
-        generalAdmission_buttons.add(gE8Button);
-        generalAdmission_buttons.add(gE9Button);
-        generalAdmission_buttons.add(gE10Button);
+        gE1Button.setName("GE1"); generalAdmission_buttons.add(gE1Button);
+        gE2Button.setName("GE2"); generalAdmission_buttons.add(gE2Button);
+        gE3Button.setName("GE3"); generalAdmission_buttons.add(gE3Button);
+        gE4Button.setName("GE4"); generalAdmission_buttons.add(gE4Button);
+        gE5Button.setName("GE5"); generalAdmission_buttons.add(gE5Button);
+        gE6Button.setName("GE6"); generalAdmission_buttons.add(gE6Button);
+        gE7Button.setName("GE7"); generalAdmission_buttons.add(gE7Button);
+        gE8Button.setName("GE8"); generalAdmission_buttons.add(gE8Button);
+        gE9Button.setName("GE9"); generalAdmission_buttons.add(gE9Button);
+        gE10Button.setName("GE10"); generalAdmission_buttons.add(gE10Button);
 
 
-        generalAdmission_buttons.add(gF1Button);
-        generalAdmission_buttons.add(gF2Button);
-        generalAdmission_buttons.add(gF3Button);
-        generalAdmission_buttons.add(gF4Button);
-        generalAdmission_buttons.add(gF5Button);
-        generalAdmission_buttons.add(gF6Button);
-        generalAdmission_buttons.add(gF7Button);
-        generalAdmission_buttons.add(gF8Button);
-        generalAdmission_buttons.add(gF9Button);
-        generalAdmission_buttons.add(gF10Button);
+        gF1Button.setName("GF1"); generalAdmission_buttons.add(gF1Button);
+        gF2Button.setName("GF2"); generalAdmission_buttons.add(gF2Button);
+        gF3Button.setName("GF3"); generalAdmission_buttons.add(gF3Button);
+        gF4Button.setName("GF4"); generalAdmission_buttons.add(gF4Button);
+        gF5Button.setName("GF5"); generalAdmission_buttons.add(gF5Button);
+        gF6Button.setName("GF6"); generalAdmission_buttons.add(gF6Button);
+        gF7Button.setName("GF7"); generalAdmission_buttons.add(gF7Button);
+        gF8Button.setName("GF8"); generalAdmission_buttons.add(gF8Button);
+        gF9Button.setName("GF9"); generalAdmission_buttons.add(gF9Button);
+        gF10Button.setName("GF10"); generalAdmission_buttons.add(gF10Button);
     }
 
     public void populateComboBox() {
+        availableConcerts = concertManager.getAvailableConcerts();
         // --- Box 1: Concert Selection ---
         // Clear it first to be safe (in case the GUI designer added example items)
         cmbox_selectConcert.removeAllItems();
 
-        availableConcerts = new ArrayList<>();
-        LocalDateTime concertDate = LocalDateTime.of(2025, 12,25,19,0);
-        Concert concert1 = new Concert("WildCats Pub Concert for a Cause", concertDate, "Zild", "CIT-U Gymnasium");
-        availableConcerts.add(concert1);
+//        availableConcerts = new ArrayList<>();
+//        LocalDateTime concertDate = LocalDateTime.of(2025, 12,25,19,0);
+//        Concert concert1 = new Concert("WildCats Pub Concert for a Cause", concertDate, "Zild", "CIT-U Gymnasium");
+//        availableConcerts.add(concert1);
 
         // 2. Box 1: Concert Selection
-        cmbox_selectConcert.removeAllItems();
+//        cmbox_selectConcert.removeAllItems();
         for (Concert concert : availableConcerts) {
             // We add the name to the JComboBox
             cmbox_selectConcert.addItem(concert.getConcertName());
@@ -515,8 +542,8 @@ public class ConcertAdmissionSystemUI extends JFrame {
             loadConcertDetails(availableConcerts.get(0));
         }
 
-        cmbox_selectConcert.removeAllItems();
-        cmbox_selectConcert.addItem(concert1.getConcertName());
+//        cmbox_selectConcert.removeAllItems();
+//        cmbox_selectConcert.addItem(concert1.getConcertName());
         // --- Box 2: Filter Selection ---
         // 1. Clear existing items (removes the stuff you typed in the GUI Designer)
         cmbox_seatingTierFilter.removeAllItems();
@@ -531,6 +558,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
     public void loadConcertDetails(Concert concert) { // Now accepts the concert object
         if (concert == null) return; // Safety check
 
+        currentConcertName = concert.getConcertName();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' h:mm a");
 
         String formattedDateTime = concert.getConcertDate().format(dtf); // Fixed: Use the passed 'concert' object
@@ -540,9 +568,13 @@ public class ConcertAdmissionSystemUI extends JFrame {
         textField1.setText(concert.getVenue());
         perksLabel.setText("No specific perks listed. Check the official concert website.");
 
-        // IMPORTANT: When a new concert is loaded, you must also reset the seat map
-        // and soldSeats count, and then call loadInfo() to load the sold seats for
-        // this specific concert (assuming TicketManager is updated to handle it).
+        // >>> START OF NEW LOGIC <<<
+        // 1. Reset all seats to available state for the new concert
+        resetAllSeats();
+
+        // 2. Load the sold seats for the newly selected concert
+        loadInfo(); // This will mark the sold seats as "TAKEN"
+        // >>> END OF NEW LOGIC <<<
     }
     public void filterSeats() {
         String selectedTier = (String) cmbox_seatingTierFilter.getSelectedItem();
@@ -578,11 +610,15 @@ public class ConcertAdmissionSystemUI extends JFrame {
     }
 
     public void loadInfo() {
+        if(currentConcertName == null || currentConcertName.isEmpty()){
+            System.out.println("Concert name is empty");
+            return;
+        }
         // 1. Get the list of taken seats from the CSV
-        List<String> takenSeats = TicketManager.loadSoldSeats();
+        List<String> takenSeats = TicketManager.loadSoldSeats(currentConcertName);
 
         // Debugging: Print to console so you can see what is happening
-        System.out.println("DEBUG: Loaded " + takenSeats.size() + " seats from CSV.");
+        System.out.println("DEBUG: Loaded " + takenSeats.size() + " seats from CSV for concert: "  + currentConcertName);
 
         // 2. Combine all buttons
         List<JButton> allButtons = new ArrayList<>();
@@ -595,13 +631,14 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
         // 4. Iterate and Update
         for (JButton btn : allButtons) {
-            // Check if the button's text (e.g., "VV-A1") is in the list
-            if (takenSeats.contains(btn.getText())) {
+            // Check if the button's internal name (the original seat ID) is in the list of taken seats
+            if (takenSeats.contains(btn.getName())) { // CRITICAL: Check the button's Name, not its current Text
+                // The Text might be "TAKEN" from a previous run, or the original seat ID
 
-                System.out.println("DEBUG: Marking " + btn.getText() + " as TAKEN.");
+                System.out.println("DEBUG: Marking " + btn.getName() + " as TAKEN.");
 
                 // VISUAL UPDATES
-                btn.setText("TAKEN");
+                btn.setText("TAKEN"); // <-- Set the text to TAKEN
                 btn.setBackground(COLOR_SOLD);
                 btn.setForeground(Color.WHITE);
 
@@ -611,6 +648,25 @@ public class ConcertAdmissionSystemUI extends JFrame {
                 btn.setBorderPainted(false);
 
                 soldSeats++;
+            } else {
+                // FIX: If it is not taken, make sure it is reset to its available state.
+                // This is the safety net if resetAllSeats() was called but the button
+                // wasn't fully cleaned up or if the ticket manager failed to find a record.
+
+                // Check its name again and use the correct background color
+                String originalSeatID = btn.getName();
+                if (originalSeatID != null) {
+                    btn.setText(originalSeatID);
+                    if (vvip_buttons.contains(btn)) {
+                        btn.setBackground(COLOR_VVIP);
+                    } else if (vip_buttons.contains(btn)) {
+                        btn.setBackground(COLOR_VIP);
+                    } else {
+                        btn.setBackground(COLOR_GEN);
+                    }
+                    btn.setForeground(Color.BLACK);
+                    btn.setBorderPainted(true);
+                }
             }
         }
 
@@ -689,6 +745,63 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
         // All validations passed → create object
         return new Customer(name, email, age);
-
     }
+
+    public void resetAllSeats() {
+        List<JButton> allButtons = new ArrayList<>();
+        allButtons.addAll(vvip_buttons);
+        allButtons.addAll(vip_buttons);
+        allButtons.addAll(generalAdmission_buttons);
+
+        // Reset the currently selected seat, if any
+        if (selectedSeat != null) {
+            resetSeatColor(selectedSeat); // Resets the color from the temporary COLOR_SELECTED
+            selectedSeat = null; // Unselect the seat
+        }
+        // Clear the selection labels
+        selectedSeatLabel.setText("~none");
+        priceLabel.setText("PHP 0.00");
+        seatTierLabel.setText("~none");
+        perksLabel.setText("~none");
+
+
+        // Reset all buttons to their default state
+        for (JButton btn : allButtons) {
+            // Use the button's internal Name property which we set in groupButtons()
+            String originalSeatID = btn.getName();
+
+            // Safety check: if name is not set, use a generic fallback.
+            if (originalSeatID == null) {
+                originalSeatID = "Seat"; // Keep this fallback just in case
+            }
+
+            btn.setText(originalSeatID); // <-- FIX: Sets the correct seat ID (e.g., VVA1)
+
+            // Re-initialize the button based on its group
+            if (vvip_buttons.contains(btn)) {
+                btn.setBackground(COLOR_VVIP);
+            } else if (vip_buttons.contains(btn)) {
+                btn.setBackground(COLOR_VIP);
+            } else { // generalAdmission_buttons
+                btn.setBackground(COLOR_GEN);
+            }
+
+            // Reset text color and styling
+            btn.setForeground(Color.BLACK); // Set text color back to default
+            btn.setOpaque(true);
+            btn.setContentAreaFilled(true);
+            btn.setBorderPainted(true);
+        }
+
+        // Reset sold seat count and progress bar display
+        soldSeats = 0;
+        progressBar1.setValue(0);
+        progressBar1.setString("0 / " + maximumCapacity + " Sold");
+
+        // Recalculate and repaint the panel
+        panelInsideScroll.revalidate();
+        panelInsideScroll.repaint();
+    }
+
+
 }

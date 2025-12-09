@@ -59,7 +59,8 @@ public class Ticket {
     }
 
     public void saveToFile(){
-        TicketManager.saveTicket(this);
+        String concertName = this.concert.getConcertName();
+        TicketManager.saveTicket(this, concertName);
     }
 
     String generateTicketID(){
