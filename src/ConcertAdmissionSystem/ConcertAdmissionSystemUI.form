@@ -63,7 +63,7 @@
               <model/>
             </properties>
           </component>
-          <component id="51597" class="javax.swing.JLabel">
+          <component id="51597" class="javax.swing.JLabel" binding="concertDateLbl">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -81,7 +81,7 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="77ce7" class="javax.swing.JLabel">
+          <component id="77ce7" class="javax.swing.JLabel" binding="artistLbl">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -99,7 +99,7 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="aa25c" class="javax.swing.JLabel">
+          <component id="aa25c" class="javax.swing.JLabel" binding="venueLbl">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -107,7 +107,7 @@
               <text value="Venue:"/>
             </properties>
           </component>
-          <component id="31494" class="javax.swing.JTextField" binding="textField1" default-binding="true">
+          <component id="31494" class="javax.swing.JTextField" binding="details_venue">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
