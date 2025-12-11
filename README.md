@@ -54,9 +54,14 @@ This project demonstrates the four pillars of OOP:
 
 👤 Authors
 <ins>Charles B. Daragosa</ins> - Lead Frontend Developer
+
 <ins>Alleah I. Dela Peña</ins> - Backend Developer
+
 <ins>Mark Lou A. Villagonzalo</ins> - Backend Developer
+
 <ins>Vonn Vincent S. Caballero Daragosa</ins> - Backend Developer
+
 <ins>Andre B. Camasura</ins> - Backend Developer
 
 Submitted for CSIT227 Object Oriented Programming Capstone
+
