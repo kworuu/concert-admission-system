@@ -1,7 +1,4 @@
-SeatNumber,CustomerName,Email,Age,Price,Tier,TicketID
-VVA1,Mark Villagonzalo,darealjexoh@gmail.com,21,600.00,VVIP,NT2417403
-GD3,charles test,scoutchampion123@gmail.com,21,200.00,General Admission,MW5268327
-VB2,alleah dela pena,alleahidelapena@gmail.com,20,450.00,VIP,NV0186994
-VB3,alleah,alleahidelapena@gmail.com,20,450.00,VIP,IF3791156
-VB4,alleah,alleahidelapena@gmail.com,20,450.00,VIP,NB7488192
-VVA2,alleah,alleahidelapena@gmail.com,20,600.00,VVIP,MU6785169
+
+YK0180430,9E61150A979D485E,VB8,Charles Daragosa,scoutchampion123@gmail.com,20,450.00,VIP,ACTIVE
+LA7120548,BD5860AB1CA02927,GE3,Andre Camsaura,camasuraandre@gmail.com,20,200.00,General Admission,ACTIVE
+JY6187973,523BBF82D0D3DBA8,VC4,Alleah g,alleahidelapena@gmail.com,20,450.00,VIP,ACTIVE
