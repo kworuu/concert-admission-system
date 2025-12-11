@@ -46,8 +46,8 @@ public class Ticket {
         return seat;
     }
 
-    public Customer getCustomer(){ 
-        return customer; 
+    public Customer getCustomer(){
+        return customer;
     }
 
     double calculateFinalPrice(){
