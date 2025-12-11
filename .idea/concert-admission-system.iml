@@ -9,7 +9,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+
     <orderEntry type="library" name="lib" level="project" />
+
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -22,12 +24,13 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/javase-3.5.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/activation-1.1.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
+
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -49,12 +52,13 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/activation-1.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/javase-3.5.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
+
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -91,5 +95,57 @@
         <SOURCES />
       </library>
     </orderEntry>
+
+    <orderEntry type="library" name="flatlaf-demo-3.7" level="project" />
+    <orderEntry type="library" name="flatlaf-extras-3.7" level="project" />
+    <orderEntry type="library" name="jsvg-2.0.0" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/itextpdf-5.5.13.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/core-3.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/javase-3.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/javax.mail-1.6.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/activation-1.1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="flatlaf-demo-3.7" level="project" />
+    <orderEntry type="library" name="flatlaf-extras-3.7" level="project" />
+    <orderEntry type="library" name="jsvg-2.0.0" level="project" />
   </component>
 </module>
