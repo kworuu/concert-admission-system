@@ -1,6 +1,8 @@
 package ConcertAdmissionSystem;
 
+import com.formdev.flatlaf.extras.FlatSVGIcon; // <--- NEW IMPORT
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -12,7 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
+import java.awt.BorderLayout;
 
 public class ConcertAdmissionSystemUI extends JFrame {
     private JPanel contentpane;
@@ -22,67 +24,27 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private JTextField enterEmailAddressTextField;
     private JTextField enterAgeTextField;
     private JComboBox<String> cmbox_seatingTierFilter;
-    private JButton VVA1Button;
-    private JButton VVA10Button;
-    private JButton VVA2Button;
-    private JButton VVA3Button;
-    private JButton VVA4Button;
-    private JButton VVA5Button;
-    private JButton VVA6Button;
-    private JButton VVA9Button;
-    private JButton VVA8Button;
-    private JButton VVA7Button;
+
+    // VVIP Buttons
+    private JButton VVA1Button, VVA10Button, VVA2Button, VVA3Button, VVA4Button;
+    private JButton VVA5Button, VVA6Button, VVA9Button, VVA8Button, VVA7Button;
+
     private JScrollBar scrollBar1;
-    private JButton vB1Button;
-    private JButton vB2Button;
-    private JButton vB3Button;
-    private JButton vB4Button;
-    private JButton vB5Button;
-    private JButton vB6Button;
-    private JButton vB8Button;
-    private JButton vB9Button;
-    private JButton vB10Button;
-    private JButton vB7Button;
-    private JButton vC1Button;
-    private JButton vC2Button;
-    private JButton vC3Button;
-    private JButton vC4Button;
-    private JButton vC5Button;
-    private JButton vC6Button;
-    private JButton vC7Button;
-    private JButton vC8Button;
-    private JButton vC9Button;
-    private JButton vC10Button;
-    private JButton gD1Button;
-    private JButton gD2Button;
-    private JButton gD3Button;
-    private JButton gD4Button;
-    private JButton gD5Button;
-    private JButton gD6Button;
-    private JButton gD7Button;
-    private JButton gD8Button;
-    private JButton gD9Button;
-    private JButton gD10Button;
-    private JButton gE1Button;
-    private JButton gE2Button;
-    private JButton gE3Button;
-    private JButton gE4Button;
-    private JButton gE5Button;
-    private JButton gE6Button;
-    private JButton gE7Button;
-    private JButton gE8Button;
-    private JButton gE9Button;
-    private JButton gE10Button;
-    private JButton gF1Button;
-    private JButton gF2Button;
-    private JButton gF3Button;
-    private JButton gF4Button;
-    private JButton gF5Button;
-    private JButton gF6Button;
-    private JButton gF7Button;
-    private JButton gF8Button;
-    private JButton gF9Button;
-    private JButton gF10Button;
+
+    // VIP Buttons
+    private JButton vB1Button, vB2Button, vB3Button, vB4Button, vB5Button;
+    private JButton vB6Button, vB8Button, vB9Button, vB10Button, vB7Button;
+    private JButton vC1Button, vC2Button, vC3Button, vC4Button, vC5Button;
+    private JButton vC6Button, vC7Button, vC8Button, vC9Button, vC10Button;
+
+    // Gen Ad Buttons
+    private JButton gD1Button, gD2Button, gD3Button, gD4Button, gD5Button;
+    private JButton gD6Button, gD7Button, gD8Button, gD9Button, gD10Button;
+    private JButton gE1Button, gE2Button, gE3Button, gE4Button, gE5Button;
+    private JButton gE6Button, gE7Button, gE8Button, gE9Button, gE10Button;
+    private JButton gF1Button, gF2Button, gF3Button, gF4Button, gF5Button;
+    private JButton gF6Button, gF7Button, gF8Button, gF9Button, gF10Button;
+
     private JButton btnConfirmTicketDetails;
     private JPanel concertDetailsPanel;
     private JPanel customerInformationPanel;
@@ -94,8 +56,11 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private JLabel perksLabel;
     private JTextField details_concertDate;
     private JTextField details_artist;
-    private JTextField textField1;
+    private JTextField details_venue; // Venue
     private JLabel seatTierLabel;
+    private JLabel venueLbl;
+    private JLabel concertDateLbl;
+    private JLabel artistLbl;
 
     // Create Lists to Group Buttons
     private final List<JButton> vvip_buttons = new ArrayList<>();
@@ -111,36 +76,119 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private JButton selectedSeat = null;
 
     // Colors
-    private final Color COLOR_VVIP = new Color(255, 215, 0);
-    private final Color COLOR_VIP = new Color(173, 216, 230);
-    private final Color COLOR_GEN = new Color(211, 211, 211);
-    private final Color COLOR_SELECTED = Color.YELLOW;
-    private final Color COLOR_SOLD = Color.RED;
+    private final Color COLOR_VVIP = new Color(255, 215, 0);       // Gold
+    private final Color COLOR_VIP = new Color(173, 216, 230);      // Light Blue
+    private final Color COLOR_GEN = new Color(220, 220, 220);      // Light Gray
+    private final Color COLOR_SELECTED = new Color(50, 205, 50);   // Lime Green
+    private final Color COLOR_SOLD = new Color(220, 53, 69);       // Modern Red
 
-    // Capacity
     private final int maximumCapacity = 60;
     private int soldSeats = 0;
 
     public ConcertAdmissionSystemUI() {
         setTitle("Concert Admission System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setContentPane(contentpane);
+
+        customizeVisuals();
+        styleCTAButton();
+
+        // --- MAIN LAYOUT ---
+        JPanel mainWrapper = new JPanel(new BorderLayout());
+
+        // --- A. HEADER (SVG Logo + Text) ---
+        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        topBar.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
+        // SVG FILE PATH
+        String logoPath = "src/assets/logos/logo4.svg";
+
+        JLabel headerLabel = new JLabel("Wildcats Pub Concerts");
+
+        // --- NEW SVG LOADING LOGIC ---
+        File svgFile = new File(logoPath);
+        if (svgFile.exists()) {
+            try {
+                // 1. Load the SVG
+                FlatSVGIcon svgIcon = new FlatSVGIcon(svgFile);
+
+                // 2. Scale it to 100px height (Calculate width to keep aspect ratio)
+                //    (We check if height is > 0 to avoid divide-by-zero errors)
+                if (svgIcon.getIconHeight() > 0) {
+                    float scale = 100f / svgIcon.getIconHeight();
+                    int newWidth = Math.round(svgIcon.getIconWidth() * scale);
+
+                    // 3. Derive a new icon with the exact size
+                    headerLabel.setIcon(svgIcon.derive(newWidth, 100));
+                } else {
+                    headerLabel.setIcon(svgIcon); // Fallback if size unknown
+                }
+            } catch (Exception e) {
+                System.out.println("Error loading SVG: " + e.getMessage());
+            }
+        }
+        // -----------------------------
+
+        headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        headerLabel.setForeground(new Color(51, 153, 255));
+        headerLabel.setIconTextGap(20);
+        headerLabel.setHorizontalTextPosition(JLabel.RIGHT);
+        headerLabel.setVerticalTextPosition(JLabel.CENTER);
+
+        topBar.add(headerLabel);
+        mainWrapper.add(topBar, BorderLayout.NORTH);
+
+
+        // --- B. SCROLLABLE CONTENT ---
+        JPanel bodyWrapper = new JPanel(new BorderLayout());
+        bodyWrapper.add(contentpane, BorderLayout.CENTER);
+        // Bottom cushion (100px)
+        bodyWrapper.setBorder(BorderFactory.createEmptyBorder(10, 20, 100, 20));
+
+        JScrollPane centerScrollPane = new JScrollPane(bodyWrapper);
+        centerScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        centerScrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        centerScrollPane.setBorder(null);
+
+        mainWrapper.add(centerScrollPane, BorderLayout.CENTER);
+        setContentPane(mainWrapper);
+
+
+        // --- FIX FOR SEAT LIST HEIGHT ---
+        if (scrollPanel != null) {
+            scrollPanel.setPreferredSize(new Dimension(scrollPanel.getPreferredSize().width, 100));
+            scrollPanel.setMinimumSize(new Dimension(0, 100));
+        }
+
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
         setLocationRelativeTo(null);
 
         concertManager = new ConcertManager();
 
-        // Set the detail fields to read-only
+// Set the detail fields to read-only
         details_concertDate.setEditable(false);
         details_artist.setEditable(false);
-        textField1.setEditable(false); // Assuming textField1 is the Venue field
+        details_venue.setEditable(false);
 
-        // You may also want to change the background to distinguish them
-        // from editable fields, although setEditable(false) usually handles appearance.
-        Color readOnlyBg = new Color(240, 240, 240); // A light gray color
-        details_concertDate.setBackground(readOnlyBg);
-        details_artist.setBackground(readOnlyBg);
-        textField1.setBackground(readOnlyBg);
+        // 2. FORCE them to look like normal (editable) text fields
+        //    We grab the colors used by the "Look and Feel" (FlatLaf) for standard fields.
+        Color standardBg = UIManager.getColor("TextField.background");
+        Color standardFg = UIManager.getColor("TextField.foreground");
+        javax.swing.border.Border standardBorder = UIManager.getBorder("TextField.border");
+
+        // 3. Apply those standard colors/borders to your read-only fields
+        details_concertDate.setBackground(standardBg);
+        details_concertDate.setForeground(standardFg);
+        details_concertDate.setBorder(standardBorder);
+
+        details_artist.setBackground(standardBg);
+        details_artist.setForeground(standardFg);
+        details_artist.setBorder(standardBorder);
+
+        details_venue.setBackground(standardBg);
+        details_venue.setForeground(standardFg);
+        details_venue.setBorder(standardBorder);
+
         // HOME notes 1 : Initialize the groups.
         groupButtons();
         populateComboBox();
@@ -157,31 +205,20 @@ public class ConcertAdmissionSystemUI extends JFrame {
                         loadConcertDetails(concert);
                     }
                 }
-//                    for (Concert concert : availableConcerts) {
-//                        if (concert.getConcertName().equals(selectedName)) {
-//                            loadConcertDetails(concert); // Update the details panel
-//                            // loadInfo(); // You would call loadInfo() here to refresh sold seats
-//                            break;
-//                        }
-//                    }
-//                }
             }
         });
 
-        // HOME notes 2 : COLOR INITIALIZATION & LISTENERES
+        // HOME notes 2 : COLOR INITIALIZATION & LISTENERS
         initalizeSeatButtons();
 
         // HOME notes 3 : Configure Progress Bar (Fixed at 70)
         progressBar1.setMinimum(0);
         progressBar1.setMaximum(maximumCapacity);
-        progressBar1.setValue(1);
+        progressBar1.setValue(0);
         progressBar1.setStringPainted(true);
         progressBar1.setString("0 / " + maximumCapacity + " Sold");
-
-        // Load Info : DRI
         loadInfo();
 
-        // HOME notes 4 : Add filtering functionality
         cmbox_seatingTierFilter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -189,8 +226,6 @@ public class ConcertAdmissionSystemUI extends JFrame {
             }
         });
 
-
-        // HOME notes 5 : Confirm Button Listener
         btnConfirmTicketDetails.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -207,8 +242,22 @@ public class ConcertAdmissionSystemUI extends JFrame {
                 handleSeatSelection(clickedButton);
             }
         };
+        for (JButton btn : vvip_buttons) {
+            btn.setBackground(COLOR_VVIP);
+            btn.setForeground(Color.BLACK);
+            btn.addActionListener(seatListener);
+        }
+        for (JButton btn : vip_buttons) {
+            btn.setBackground(COLOR_VIP);
+            btn.setForeground(Color.BLACK);
+            btn.addActionListener(seatListener);
+        }
+        for (JButton btn : generalAdmission_buttons) {
+            btn.setBackground(COLOR_GEN);
+            btn.setForeground(Color.BLACK);
+            btn.addActionListener(seatListener);
+        }
 
-        // Helper to initialize button properties
         List<List<JButton>> allTiers = Arrays.asList(vvip_buttons, vip_buttons, generalAdmission_buttons);
         Color[] tierColors = {COLOR_VVIP, COLOR_VIP, COLOR_GEN};
 
@@ -251,35 +300,31 @@ public class ConcertAdmissionSystemUI extends JFrame {
         if (selectedSeat != null) {
             resetSeatColor(selectedSeat);
         }
-        // set selected seat;
+        if (selectedSeat == clickedButton) {
+            selectedSeat = null;
+            selectedSeatLabel.setText("~none");
+            priceLabel.setText("PHP 0.00");
+            perksLabel.setText("-");
+            seatTierLabel.setText("-");
+            return;
+        }
+
         selectedSeat = clickedButton;
         selectedSeat.setBackground(COLOR_SELECTED);
+        selectedSeat.setForeground(Color.BLACK);
         selectedSeatLabel.setText(selectedSeat.getText());
 
-        // update price label
         if (vvip_buttons.contains(clickedButton)) {
             priceLabel.setText("PHP 600.00");
-        } else if (vip_buttons.contains(clickedButton)) {
-            priceLabel.setText("PHP 450.00");
-        } else if (generalAdmission_buttons.contains(clickedButton)) {
-            priceLabel.setText("PHP 200.00");
-        }
-
-        // update perks label
-        if (vvip_buttons.contains(clickedButton)) {
             perksLabel.setText("Backstage Pass");
-        } else if (vip_buttons.contains(clickedButton)) {
-            perksLabel.setText("Free Table");
-        } else if (generalAdmission_buttons.contains(clickedButton)) {
-            perksLabel.setText("~none");
-        }
-
-        // update seatTier Label
-        if (vvip_buttons.contains(clickedButton)) {
             seatTierLabel.setText("VVIP");
         } else if (vip_buttons.contains(clickedButton)) {
+            priceLabel.setText("PHP 450.00");
+            perksLabel.setText("Free Table");
             seatTierLabel.setText("VIP");
         } else if (generalAdmission_buttons.contains(clickedButton)) {
+            priceLabel.setText("PHP 200.00");
+            perksLabel.setText("~none");
             seatTierLabel.setText("General Admission");
         }
     }
@@ -405,34 +450,30 @@ public class ConcertAdmissionSystemUI extends JFrame {
                 selectedSeat.setForeground(Color.WHITE);
                 selectedSeat.setOpaque(true);
                 selectedSeat.setBorderPainted(false);
+
                 soldSeats++;
                 progressBar1.setValue(soldSeats);
                 progressBar1.setString(soldSeats + " / " + maximumCapacity + " Sold");
-                selectedSeat = null;
-                selectedSeatLabel.setText("~none");
-                priceLabel.setText("PHP 0.00");
-                enterFullNameTextField.setText("");
-                enterEmailAddressTextField.setText("");
-                enterAgeTextField.setText("");
 
-                JOptionPane.showMessageDialog(this, "✅ Success! Ticket Confirmed and Emailed to " + customer.getEmail() + ".\nTicket ID: " + ticketID, "Purchase Complete", JOptionPane.INFORMATION_MESSAGE);
+                resetSelectionUI();
+                JOptionPane.showMessageDialog(this, "Ticket Confirmed! Check your email.", "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                // Handle Email Failure
-                JOptionPane.showMessageDialog(this,
-                        "⚠️ Warning! The seat was reserved, but the email failed to send. Check the console for JavaMail errors.\nSeat remains SELECTED. Please contact support or retry the purchase.",
-                        "Email Failure", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Failed to send email. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
-            // 11. Clean up the temporary PDF file (CRITICAL STEP)
             if (pdfPath != null) {
-                try {
-                    // Ensure java.io.File is imported
-                    new File(pdfPath).delete();
-                } catch (Exception fileCleanupException) {
-                    // Ignore failure to delete the temp file
-                }
+                try { new File(pdfPath).delete(); } catch (Exception ignored) {}
             }
         }
+    }
+
+    private void resetSelectionUI() {
+        selectedSeat = null;
+        selectedSeatLabel.setText("~none");
+        priceLabel.setText("PHP 0.00");
+        enterFullNameTextField.setText("");
+        enterEmailAddressTextField.setText("");
+        enterAgeTextField.setText("");
     }
 // --- END OF NEW METHODS ---
 
@@ -444,6 +485,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
         } else {
             btn.setBackground(COLOR_GEN);
         }
+        btn.setForeground(Color.BLACK);
     }
     public void groupButtons() { // groupButtons note 1 : add each individual button to its corresponding list.
         // VVIP
@@ -565,7 +607,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
         details_artist.setText(concert.getArtist());
         details_concertDate.setText(formattedDateTime);
-        textField1.setText(concert.getVenue());
+        details_venue.setText(concert.getVenue());
         perksLabel.setText("No specific perks listed. Check the official concert website.");
 
         // >>> START OF NEW LOGIC <<<
@@ -576,35 +618,17 @@ public class ConcertAdmissionSystemUI extends JFrame {
         loadInfo(); // This will mark the sold seats as "TAKEN"
         // >>> END OF NEW LOGIC <<<
     }
+
     public void filterSeats() {
         String selectedTier = (String) cmbox_seatingTierFilter.getSelectedItem();
-
         if(selectedTier == null) return;
-
-        // filterSeats notes 1 : Helper method to make code cleaner
         boolean showAll = selectedTier.equals("All");
-        boolean showVVIP = selectedTier.equals("VVIP (PHP 600)");
-        boolean showVIP = selectedTier.equals("VIP (PHP 450)");
-        boolean showGeneralAdmission = selectedTier.equals("General Admission (PHP 200)");
-
-        // filterSeats notes 2 : Loop through VVIP View buttons
-        for (JButton btn : vvip_buttons) {
-            btn.setVisible(showAll || showVVIP);
-        }
-
-        // filterSeats notes 3 : Loop through VIP View buttons
-        for (JButton btn : vip_buttons) {
-            btn.setVisible(showAll || showVIP);
-        }
-
-        // filterSeats notes 4 : Loop through General Admission View buttons
-        for (JButton btn : generalAdmission_buttons) {
-            btn.setVisible(showAll || showGeneralAdmission);
-        }
-
-        // filterSeats notes 5 : REFRESH PANEL INSIDE THE JSCROLLPANE
-        // This tells the panel inside the scroll pane to recalculate its size and content
-        // now that some buttons are hidden.
+        boolean showVVIP = selectedTier.contains("VVIP");
+        boolean showVIP = selectedTier.contains("VIP") && !selectedTier.contains("VVIP");
+        boolean showGeneralAdmission = selectedTier.contains("General");
+        for (JButton btn : vvip_buttons) btn.setVisible(showAll || showVVIP);
+        for (JButton btn : vip_buttons) btn.setVisible(showAll || showVIP);
+        for (JButton btn : generalAdmission_buttons) btn.setVisible(showAll || showGeneralAdmission);
         panelInsideScroll.revalidate();
         panelInsideScroll.repaint();
     }
@@ -695,37 +719,37 @@ public class ConcertAdmissionSystemUI extends JFrame {
         return true;
     }
 
-    private Customer createCustomerFromInput(){
+    private Customer createCustomerFromInput() {
         String name = enterFullNameTextField.getText().trim();
         String email = enterEmailAddressTextField.getText().trim();
         String ageText = enterAgeTextField.getText().trim();
         int age;
 
         //Name validation
-        if(name.isEmpty()){
+        if (name.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter your Full Name.");
             return null;
         }
 
-        if(!checkName(name)){
+        if (!checkName(name)) {
             JOptionPane.showMessageDialog(this, "Please enter a valid name.");
             return null;
         }
 
         // Email validation
-        if(email.isEmpty()){
+        if (email.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter your Email Address.");
             return null;
         }
 
-        if(!isValidEmail(email)){
+        if (!isValidEmail(email)) {
             JOptionPane.showMessageDialog(this, "Please enter a valid email address.");
             return null;
         }
 
         //Age validation
 
-        if(ageText.isEmpty()){
+        if (ageText.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter your age", "Missing Input", JOptionPane.WARNING_MESSAGE);
             return null;
         }
@@ -746,62 +770,94 @@ public class ConcertAdmissionSystemUI extends JFrame {
         // All validations passed → create object
         return new Customer(name, email, age);
     }
-
-    public void resetAllSeats() {
-        List<JButton> allButtons = new ArrayList<>();
-        allButtons.addAll(vvip_buttons);
-        allButtons.addAll(vip_buttons);
-        allButtons.addAll(generalAdmission_buttons);
-
-        // Reset the currently selected seat, if any
-        if (selectedSeat != null) {
-            resetSeatColor(selectedSeat); // Resets the color from the temporary COLOR_SELECTED
-            selectedSeat = null; // Unselect the seat
-        }
-        // Clear the selection labels
-        selectedSeatLabel.setText("~none");
-        priceLabel.setText("PHP 0.00");
-        seatTierLabel.setText("~none");
-        perksLabel.setText("~none");
-
-
-        // Reset all buttons to their default state
-        for (JButton btn : allButtons) {
-            // Use the button's internal Name property which we set in groupButtons()
-            String originalSeatID = btn.getName();
-
-            // Safety check: if name is not set, use a generic fallback.
-            if (originalSeatID == null) {
-                originalSeatID = "Seat"; // Keep this fallback just in case
-            }
-
-            btn.setText(originalSeatID); // <-- FIX: Sets the correct seat ID (e.g., VVA1)
-
-            // Re-initialize the button based on its group
-            if (vvip_buttons.contains(btn)) {
-                btn.setBackground(COLOR_VVIP);
-            } else if (vip_buttons.contains(btn)) {
-                btn.setBackground(COLOR_VIP);
-            } else { // generalAdmission_buttons
-                btn.setBackground(COLOR_GEN);
-            }
-
-            // Reset text color and styling
-            btn.setForeground(Color.BLACK); // Set text color back to default
-            btn.setOpaque(true);
-            btn.setContentAreaFilled(true);
-            btn.setBorderPainted(true);
-        }
-
-        // Reset sold seat count and progress bar display
-        soldSeats = 0;
-        progressBar1.setValue(0);
-        progressBar1.setString("0 / " + maximumCapacity + " Sold");
-
-        // Recalculate and repaint the panel
-        panelInsideScroll.revalidate();
-        panelInsideScroll.repaint();
+    private void customizeVisuals() {
+        Font headerFont = new Font(Font.SANS_SERIF, Font.BOLD, 18);
+        Color headerColor = new Color(51, 153, 255);
+        styleSectionPanel(concertDetailsPanel, "1. Concert Details", headerFont, headerColor);
+        styleSectionPanel(customerInformationPanel, "2. Customer Information", headerFont, headerColor);
+        styleSectionPanel(seatSelectionPanel, "3. Seat Selection", headerFont, headerColor);
     }
 
+    private void styleSectionPanel(JPanel panel, String title, Font font, Color color) {
+        if (panel == null) return;
+        javax.swing.border.TitledBorder titledBorder = BorderFactory.createTitledBorder(title);
+        titledBorder.setTitleFont(font);
+        titledBorder.setTitleColor(color);
+        javax.swing.border.Border compoundBorder = BorderFactory.createCompoundBorder(
+                titledBorder,
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        );
+        panel.setBorder(compoundBorder);
+    }
 
+    private void styleCTAButton() {
+        if (btnConfirmTicketDetails == null) return;
+        btnConfirmTicketDetails.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        btnConfirmTicketDetails.setBackground(new Color(40, 167, 69));
+        btnConfirmTicketDetails.setForeground(Color.WHITE);
+        btnConfirmTicketDetails.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnConfirmTicketDetails.setFocusPainted(false);
+        btnConfirmTicketDetails.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(40, 167, 69), 1),
+                        BorderFactory.createEmptyBorder(15, 40, 15, 40)
+                )
+        );
+    }
+
+                public void resetAllSeats() {
+                    List<JButton> allButtons = new ArrayList<>();
+                    allButtons.addAll(vvip_buttons);
+                    allButtons.addAll(vip_buttons);
+                    allButtons.addAll(generalAdmission_buttons);
+
+                    // Reset the currently selected seat, if any
+                    if (selectedSeat != null) {
+                        resetSeatColor(selectedSeat); // Resets the color from the temporary COLOR_SELECTED
+                        selectedSeat = null; // Unselect the seat
+                    }
+                    // Clear the selection labels
+                    selectedSeatLabel.setText("~none");
+                    priceLabel.setText("PHP 0.00");
+                    seatTierLabel.setText("~none");
+                    perksLabel.setText("~none");
+
+
+                    // Reset all buttons to their default state
+                    for (JButton btn : allButtons) {
+                        // Use the button's internal Name property which we set in groupButtons()
+                        String originalSeatID = btn.getName();
+
+                        // Safety check: if name is not set, use a generic fallback.
+                        if (originalSeatID == null) {
+                            originalSeatID = "Seat"; // Keep this fallback just in case
+                        }
+
+                        btn.setText(originalSeatID); // <-- FIX: Sets the correct seat ID (e.g., VVA1)
+
+                        // Re-initialize the button based on its group
+                        if (vvip_buttons.contains(btn)) {
+                            btn.setBackground(COLOR_VVIP);
+                        } else if (vip_buttons.contains(btn)) {
+                            btn.setBackground(COLOR_VIP);
+                        } else { // generalAdmission_buttons
+                            btn.setBackground(COLOR_GEN);
+                        }
+
+                        // Reset text color and styling
+                        btn.setForeground(Color.BLACK); // Set text color back to default
+                        btn.setOpaque(true);
+                        btn.setContentAreaFilled(true);
+                        btn.setBorderPainted(true);
+                    }
+
+                    // Reset sold seat count and progress bar display
+                    soldSeats = 0;
+                    progressBar1.setValue(0);
+                    progressBar1.setString("0 / " + maximumCapacity + " Sold");
+
+                    // Recalculate and repaint the panel
+                    panelInsideScroll.revalidate();
+                    panelInsideScroll.repaint();
+                }
 }

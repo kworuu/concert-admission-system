@@ -7,7 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-
+/**
+ * Manages the storage and retrieval of sold seat data.
+ * Each concert's sold seats are stored in a unique CSV file named
+ * "[ConcertName]TicketsSold.csv".
+ */
 public class TicketManager {
 
     private static final String CSV_PATH =
@@ -16,6 +20,11 @@ public class TicketManager {
     private static final String FILE_PATH =
             System.getProperty("user.dir") + File.separator + "TicketsSold.csv";
 
+    /**
+     * Helper method to generate the file path based on the concert name.
+     * @param concertName The name of the concert.
+     * @return The Path object for the specific concert's ticket file.
+     */
     private static Path getConcertFilePath(String concertName) {
         // Sanitize the name to be file-system friendly (replace non-alphanumeric/hyphen/dot characters with an underscore)
         String sanitizedName = concertName.replaceAll("[^a-zA-Z0-9.-]", "_");
@@ -91,6 +100,11 @@ public class TicketManager {
         }
     }
 
+    /**
+     * Saves a newly purchased ticket record to the CSV file corresponding to the specified concert.
+     * @param ticket The ticket object containing all purchase information.
+     * @param concertName The name of the concert to save data for.
+     */
     public static void saveTicket(Ticket ticket, String concertName) {
         Path filePath = getConcertFilePath(concertName);
         File file = filePath.toFile();
@@ -130,6 +144,11 @@ public class TicketManager {
         }
     }
 
+    /**
+     * Loads the list of sold seat identifiers from the CSV file corresponding to the concert.
+     * @param concertName The name of the concert to load data for.
+     * @return A list of seat identifiers (e.g., ["VVA1", "VVB2"]).
+     */
     public static List<String> loadSoldSeats(String concertName) {
         List<String> soldSeats = new ArrayList<>();
         Path filePath = getConcertFilePath(concertName);
