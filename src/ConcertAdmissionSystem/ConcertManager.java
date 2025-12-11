@@ -14,7 +14,7 @@ public class ConcertManager {
     // 1. Private static final instance of the manager (the Singleton)
     private static final ConcertManager INSTANCE = new ConcertManager();
 
-    // 2. Private instance variable to hold the list of concerts
+    // 2a. Private instance variable to hold the list of concerts
     private final List<Concert> availableConcerts;
 
     // 3. Private Constructor: Prevents external classes from creating new instances

@@ -1,19 +1,27 @@
 package ConcertAdmissionSystem;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Concert {
-    private String concertName = "WildCats Pub Concert";
-    private LocalDate concertDate = LocalDate.of(2025, 11, 27);
-    private String artist = "Midnasty";
-    private String venue = "WIldCats Pub";
+    private String concertName;
+    private LocalDateTime concertDate;
+    private String artist;
+    private String venue;
+
+    public Concert(String concertName, LocalDateTime concertDate, String artist, String venue) {
+        this.concertName = concertName;
+        this.concertDate = concertDate;
+        this.artist = artist;
+        this.venue = venue;
+    }
 
     public String getConcertName() {
         return concertName;
     }
 
-    public LocalDate getConcertDate() {
+    public LocalDateTime getConcertDate() {
         return concertDate;
     }
 

@@ -7,6 +7,75 @@ import java.util.List;
 public class TicketManager {
 
     private static final String FILE_PATH = "TicketsSold.csv";
+    private static final String CSV_PATH = "concert-admission-system/ticketSold.csv";
+
+    // Check if ticket was already used
+    public static boolean isTicketUsed(String ticketID) {
+        try (BufferedReader br = new BufferedReader(new FileReader(CSV_PATH))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts[0].equals(ticketID)) {
+                    return parts[4].equalsIgnoreCase("USED");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Verify ticket exists + matching hash
+    public static boolean verifyTicket(String ticketID, String verificationHash) {
+        try (BufferedReader br = new BufferedReader(new FileReader(CSV_PATH))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+
+                if (parts[0].equals(ticketID)) {
+                    return parts[1].equalsIgnoreCase(verificationHash);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Mark ticket as used
+    public static void markTicketAsUsed(String ticketID) {
+        try {
+            File file = new File(CSV_PATH);
+            List<String> newLines = new ArrayList<>();
+
+            // Rewrite CSV with updated "USED"
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+
+                while ((line = br.readLine()) != null) {
+                    String[] parts = line.split(",");
+
+                    if (parts[0].equals(ticketID)) {
+                        parts[4] = "USED";
+                        System.out.println("Ticket marked as used: " + ticketID);
+                    }
+
+                    newLines.add(String.join(",", parts));
+                }
+            }
+
+            // Write new CSV file
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+                for (String s : newLines) {
+                    bw.write(s);
+                    bw.newLine();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void saveTicket(String seat, String name, String email, String age, String price, String tier) {
         try {
