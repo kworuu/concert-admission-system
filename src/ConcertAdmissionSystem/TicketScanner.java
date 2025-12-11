@@ -33,22 +33,60 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        // --- SMART CAMERA SELECTOR ---
         java.util.List<Webcam> cams = Webcam.getWebcams();
-        if (cams.size() > 1) {
-            webcam = cams.get(1); // Set to Azurewave
-        } else {
-            webcam = Webcam.getDefault(); // Fallback if Azurewave moves to index 0
+        webcam = null;
+
+        System.out.println("--- SEARCHING FOR NATIVE CAMERA ---");
+
+        for (Webcam cam : cams) {
+            String name = cam.getName();
+            System.out.println("Found: " + name);
+
+            // Filter out OBS, DroidCam, and Virtual cameras
+            // We want a camera that DOES NOT contain these words
+            if (!name.contains("OBS") && !name.contains("DroidCam") && !name.contains("Virtual")) {
+                webcam = cam;
+                System.out.println(">>> SELECTED: " + name);
+                break; // Stop looking, we found a real camera
+            }
         }
 
+// Fallback: If we couldn't find a "Real" camera, just use the default one
         if (webcam == null) {
-            JOptionPane.showMessageDialog(this,
-                    "No webcam detected! Fallback to file selection mode.",
-                    "No Webcam", JOptionPane.WARNING_MESSAGE);
-            setupFileMode();
-            return;
+            System.out.println(">>> No native camera found, falling back to default.");
+            webcam = Webcam.getDefault();
+        }
+// -----------------------------
+
+        // --- START OF SMART RESOLUTION FIX ---
+// 1. Get all sizes the camera actually supports
+        Dimension[] nonStandardSizes = webcam.getViewSizes();
+        Dimension bestSize = null;
+
+// 2. Loop through and look for 640x480 (VGA) first
+        for (Dimension d : nonStandardSizes) {
+            if (d.width == 640 && d.height == 480) {
+                bestSize = d;
+                break;
+            }
         }
 
-        webcam.setViewSize(WebcamResolution.VGA.getSize());
+// 3. If 640x480 isn't there, just pick the largest available size (usually the last one)
+        if (bestSize == null && nonStandardSizes.length > 0) {
+            bestSize = nonStandardSizes[nonStandardSizes.length - 1];
+        }
+
+// 4. Set the size safely
+        if (bestSize != null) {
+            webcam.setCustomViewSizes(nonStandardSizes); // Register the sizes first
+            webcam.setViewSize(bestSize);
+            System.out.println("✅ Camera resolution set to: " + bestSize.width + "x" + bestSize.height);
+        } else {
+            System.err.println("⚠️ Could not determine a valid camera resolution.");
+        }
+// --- END OF SMART RESOLUTION FIX ---
+
         webcam.open();
 
         // Camera panel (top)
