@@ -2,7 +2,7 @@ package ConcertAdmissionSystem;
 
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfWriter; // <-- CRITICAL: ADD THIS IMPORT
+import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -12,6 +12,7 @@ import java.net.URL;
 public class BackgroundEvent extends PdfPageEventHelper {
 
     private String ticketType; // e.g., "GEN ADD", "VIP", "VVIP"
+    private static final int SECOND_PAGE = 2; // Constant for the second page number
 
     // Constructor to receive the ticket type
     public BackgroundEvent(String type) {
@@ -20,6 +21,8 @@ public class BackgroundEvent extends PdfPageEventHelper {
 
     @Override
     public void onEndPage(PdfWriter writer, Document document) {
+        // The current page number is crucial for this logic
+        int pageNumber = writer.getPageNumber();
 
         try {
             // 1. Get the 'under' content layer
@@ -27,7 +30,14 @@ public class BackgroundEvent extends PdfPageEventHelper {
             canvas.saveState();
 
             // 2. Determine the path for the correct image
-            String filename = determineImageName(this.ticketType);
+            String filename;
+            if (pageNumber == SECOND_PAGE) {
+                // Use a different method for the second page's background
+                filename = determineSecondPageImageName(this.ticketType);
+            } else {
+                // Use the original method for the first page
+                filename = determineImageName(this.ticketType);
+            }
 
             // 3. Load the Image instance from the file path
             Image background = loadImageFromResources(filename);
@@ -45,13 +55,14 @@ public class BackgroundEvent extends PdfPageEventHelper {
 
         } catch (IOException | DocumentException e) {
             // Handle error: Failed to load image or add to document
-            System.err.println("Failed to load or add background image for ticket type: " + this.ticketType);
+            System.err.println("Failed to load or add background image for ticket type: " + this.ticketType
+                    + " on page " + pageNumber);
             e.printStackTrace();
         }
     }
 
     /**
-     * Maps the ticket type string to the local file path of the corresponding image.
+     * Maps the ticket type string to the local file path of the *first page* image.
      */
     private String determineImageName(String type) {
         // Normalize the type string for reliable comparison
@@ -68,7 +79,26 @@ public class BackgroundEvent extends PdfPageEventHelper {
         }
     }
 
+    /**
+     * Maps the ticket type string to the local file path of the *second page* image.
+     * This is the new method you requested.
+     */
+    private String determineSecondPageImageName(String type) {
+        String normalizedType = type.toUpperCase().trim();
+
+        switch (normalizedType) {
+            case "VIP":
+                return "p2_VIP.png";
+            case "VVIP":
+                return "p2_VVIP.png";
+            default:
+                // for GenADD BG
+                return "p2_GenAdd.png";
+        }
+    }
+
     private Image loadImageFromResources(String filename) throws IOException, DocumentException {
+        // Assume the second page images are in the same folder, e.g., /assets/ticket-background/
         String resourcePath = "/assets/ticket-background/" + filename;
         URL resourceUrl = getClass().getResource(resourcePath);
 

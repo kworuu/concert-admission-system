@@ -1,61 +1,73 @@
 package ConcertAdmissionSystem;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Manages the storage and retrieval of sold seat data.
- * Each concert's sold seats are stored in a unique CSV file named
- * "[ConcertName]TicketsSold.csv".
- */
 public class TicketManager {
 
-    private static final String CSV_PATH =
-            System.getProperty("user.dir") + File.separator + "ticketSold.csv";
+    // The Master File (Used by the Scanner to check ALL tickets)
+    private static final String MASTER_CSV_PATH = "MasterTicketList.csv";
 
-    private static final String FILE_PATH =
-            System.getProperty("user.dir") + File.separator + "TicketsSold.csv";
-
-    /**
-     * Helper method to generate the file path based on the concert name.
-     * @param concertName The name of the concert.
-     * @return The Path object for the specific concert's ticket file.
-     */
+    // Helper to generate the unique file path for a specific concert (Used by UI)
     private static Path getConcertFilePath(String concertName) {
-        // Sanitize the name to be file-system friendly (replace non-alphanumeric/hyphen/dot characters with an underscore)
         String sanitizedName = concertName.replaceAll("[^a-zA-Z0-9.-]", "_");
-        String fileName = sanitizedName + "TicketsSold.csv";
-        return Paths.get(fileName);
+        return Paths.get(sanitizedName + "TicketsSold.csv");
     }
 
-    // Check if ticket was already used
+    public static String generateVerificationHash(String ticketID, String email, String seatNum) {
+        try {
+            String secret = "WILDCATS_SECRET_2025"; // Secret Key
+            String data = ticketID + email + seatNum + secret;
+
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString().substring(0, 16).toUpperCase();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "ERROR";
+        }
+    }
+
+    // --- SCANNER METHODS (Read from MASTER_CSV_PATH) ---
+
     public static boolean isTicketUsed(String ticketID) {
-        try (BufferedReader br = new BufferedReader(new FileReader(CSV_PATH))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(MASTER_CSV_PATH))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts[0].equals(ticketID)) {
-                    return parts[4].equalsIgnoreCase("USED");
+                // Column 0 is ID, Column 8 is Status
+                if (parts.length > 8 && parts[0].equals(ticketID)) {
+                    return parts[8].equalsIgnoreCase("USED");
                 }
             }
+        } catch (FileNotFoundException e) {
+            System.out.println("Master ticket file not found yet.");
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    // Verify ticket exists + matching hash
     public static boolean verifyTicket(String ticketID, String verificationHash) {
-        try (BufferedReader br = new BufferedReader(new FileReader(CSV_PATH))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(MASTER_CSV_PATH))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
-
-                if (parts[0].equals(ticketID)) {
+                // Column 0 is ID, Column 1 is Hash
+                if (parts.length > 1 && parts[0].equals(ticketID)) {
                     return parts[1].equalsIgnoreCase(verificationHash);
                 }
             }
@@ -65,122 +77,102 @@ public class TicketManager {
         return false;
     }
 
-    // Mark ticket as used
     public static void markTicketAsUsed(String ticketID) {
-        try {
-            File file = new File(CSV_PATH);
-            List<String> newLines = new ArrayList<>();
+        File file = new File(MASTER_CSV_PATH);
+        List<String> newLines = new ArrayList<>();
+        boolean found = false;
 
-            // Rewrite CSV with updated "USED"
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String line;
-
-                while ((line = br.readLine()) != null) {
-                    String[] parts = line.split(",");
-
-                    if (parts[0].equals(ticketID)) {
-                        parts[4] = "USED";
-                        System.out.println("Ticket marked as used: " + ticketID);
-                    }
-
-                    newLines.add(String.join(",", parts));
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length > 8 && parts[0].equals(ticketID)) {
+                    parts[8] = "USED"; // Update Status at index 8
+                    found = true;
+                    System.out.println("Ticket " + ticketID + " marked as USED.");
                 }
+                newLines.add(String.join(",", parts));
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-            // Write new CSV file
+        if (found) {
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
                 for (String s : newLines) {
                     bw.write(s);
                     bw.newLine();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
-    /**
-     * Saves a newly purchased ticket record to the CSV file corresponding to the specified concert.
-     * @param ticket The ticket object containing all purchase information.
-     * @param concertName The name of the concert to save data for.
-     */
+    // --- UI METHODS (Save to BOTH files) ---
+
     public static void saveTicket(Ticket ticket, String concertName) {
-        Path filePath = getConcertFilePath(concertName);
-        File file = filePath.toFile();
+        String id = ticket.getTicketID();
+        String seat = ticket.getSeat().getSeatNumber();
+        String name = ticket.getCustomer().getName();
+        String email = ticket.getCustomer().getEmail();
+        String age = String.valueOf(ticket.getCustomer().getAge());
+        String price = String.format("%.2f", ticket.getPrice());
+        String tier = ticket.getSeating().getTierName();
+        String status = "ACTIVE";
+        // Generate Hash locally so it is saved in the CSV
+        String hash = generateVerificationHash(id, email, seat);
 
+        // Standard CSV Record Format:
+        // 0:ID, 1:Hash, 2:Seat, 3:Name, 4:Email, 5:Age, 6:Price, 7:Tier, 8:Status
+        String record = String.join(",", id, hash, seat, name, email, age, price, tier, status);
+
+        // 2. Save to Master File (For Scanner)
+        saveToCsv(Paths.get(MASTER_CSV_PATH), record);
+
+        // 3. Save to Concert Specific File (For UI "Taken" Seats)
+        saveToCsv(getConcertFilePath(concertName), record);
+    }
+
+    private static void saveToCsv(Path path, String record) {
         try {
-            // Check if the file exists and is empty to determine if the header is needed
-            boolean isNewFile = !Files.exists(filePath) || Files.size(filePath) == 0;
-
-            // Use FileWriter with true for append mode
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-
-            if (isNewFile) {
-                // Header must be written only once
-                writer.write("SeatNumber,CustomerName,Email,Age,Price,Tier,TicketID");
+            boolean isNewFile = !Files.exists(path);
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile(), true))) {
+                if (isNewFile) {
+                    // Write Header
+                    writer.write("TicketID,Hash,SeatNumber,CustomerName,Email,Age,Price,Tier,Status");
+                    writer.newLine();
+                }
+                writer.write(record);
                 writer.newLine();
             }
-
-            // Extract data directly from the Ticket object hierarchy
-            // Note: Assuming getSeatNumber() and getSeating() methods exist in Ticket/Seat classes.
-            String seat  = ticket.getSeat().getSeatNumber();
-            String name  = ticket.getCustomer().getName();
-            String email = ticket.getCustomer().getEmail();
-            String age   = String.valueOf(ticket.getCustomer().getAge());
-            String price = String.format("%.2f", ticket.getPrice());
-            String tier  = ticket.getSeating().getTierName();
-            String id    = ticket.getTicketID();
-
-            // Create CSV record
-            String record = String.join(",", seat, name, email, age, price, tier, id);
-
-            writer.write(record);
-            writer.newLine();
-            writer.close();
-
         } catch (IOException e) {
-            System.err.println("Error saving ticket: " + e.getMessage());
+            System.err.println("Error saving to CSV: " + path + " - " + e.getMessage());
         }
     }
 
-    /**
-     * Loads the list of sold seat identifiers from the CSV file corresponding to the concert.
-     * @param concertName The name of the concert to load data for.
-     * @return A list of seat identifiers (e.g., ["VVA1", "VVB2"]).
-     */
     public static List<String> loadSoldSeats(String concertName) {
         List<String> soldSeats = new ArrayList<>();
         Path filePath = getConcertFilePath(concertName);
-        File file = filePath.toFile();
 
         if (!Files.exists(filePath)) {
-            // File does not exist for this concert, return empty list
             return soldSeats;
         }
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
             String line;
-            boolean isFirstLine = true;
+            reader.readLine(); // Skip header
 
             while ((line = reader.readLine()) != null) {
-                if (isFirstLine) {
-                    isFirstLine = false;
-                    continue; // Skip the header line
-                }
-
                 String[] data = line.split(",");
-                // The Seat Number (identifier) is at index 0
-                if (data.length > 0) {
-                    soldSeats.add(data[0].trim());
+                // In our new format, SeatNumber is at Index 2
+                if (data.length > 2) {
+                    soldSeats.add(data[2].trim());
                 }
             }
-            reader.close();
         } catch (IOException e) {
-            System.err.println("Error loading tickets: " + e.getMessage());
+            System.err.println("Error loading sold seats: " + e.getMessage());
         }
         return soldSeats;
     }
 }
-
