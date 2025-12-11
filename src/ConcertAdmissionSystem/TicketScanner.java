@@ -30,8 +30,22 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
         super();
 
         setTitle("🎫 WildCats Pub - Ticket Scanner");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // --- CHANGE 1: STOP KILLING THE APP ---
+        // Change EXIT_ON_CLOSE to DISPOSE_ON_CLOSE
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        // --------------------------------------
+
         setLayout(new BorderLayout());
+
+        // --- CHANGE 2: TURN OFF CAMERA WHEN CLOSED ---
+        // This ensures the green camera light goes off when you close the window
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                closeScanner();
+            }
+        });
 
         // --- SMART CAMERA SELECTOR ---
         java.util.List<Webcam> cams = Webcam.getWebcams();
@@ -318,6 +332,20 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
         Thread t = new Thread(r, "Scanner-Thread");
         t.setDaemon(true);
         return t;
+    }
+
+    public void closeScanner() {
+        scanning = false; // Stops the while loop
+
+        if (webcam != null && webcam.isOpen()) {
+            webcam.close(); // Turns off the hardware camera
+        }
+
+        if (executor instanceof java.util.concurrent.ExecutorService) {
+            ((java.util.concurrent.ExecutorService) executor).shutdown();
+        }
+
+        dispose(); // Closes the window visually
     }
 
     public static void main(String[] args) {
