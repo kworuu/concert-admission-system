@@ -33,8 +33,13 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Setup webcam
-        webcam = Webcam.getDefault();
+        java.util.List<Webcam> cams = Webcam.getWebcams();
+        if (cams.size() > 1) {
+            webcam = cams.get(1); // Set to Azurewave
+        } else {
+            webcam = Webcam.getDefault(); // Fallback if Azurewave moves to index 0
+        }
+
         if (webcam == null) {
             JOptionPane.showMessageDialog(this,
                     "No webcam detected! Fallback to file selection mode.",
@@ -60,7 +65,7 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
         resultPanel.setBackground(Color.WHITE);
         resultPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        statusLabel = new JLabel("🔍 Scanning for QR codes...", SwingConstants.CENTER);
+        statusLabel = new JLabel("Scanning for QR codes...", SwingConstants.CENTER);
         statusLabel.setFont(new Font("Arial", Font.BOLD, 20));
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
