@@ -2,42 +2,35 @@ package ConcertAdmissionSystem;
 
 import java.time.LocalDate;
 
-public class SeatingTier extends Ticket{
+public class SeatingTier {
     private String tierName;
-    private double basePrice;
+    private double price;
     private String perks;
-    private int maxCapacity;
-    private int currentSold;
 
-    public SeatingTier(String ticketID, double price, Concert concert, SeatingTier seating, Seat seat, LocalDate timeBought, String tierName, double basePrice, String perks, int maxCapacity, int currentSold) {
-        super(ticketID, price, concert, seating, seat, timeBought);
+    public SeatingTier(String tierName, double price, String perks) {
         this.tierName = tierName;
-        this.basePrice = basePrice;
+        this.price = price;
         this.perks = perks;
-        this.maxCapacity = maxCapacity;
-        this.currentSold = currentSold;
     }
 
-    void sellOneSeat() {
-        currentSold++;
+    public double getPrice() {
+        return price;
     }
 
-    int getCurrentSold() {
-        return currentSold;
+    public String getPerks() {
+        return perks;
     }
 
-    boolean isAvailable(){
-        if(currentSold < maxCapacity){
-            return true;
-        }
-        return false;
+    public String getTierName() {
+        return tierName;
     }
 
     String getTierInfo(){
-        return tierName + " will be able to access to: " + perks;
+        return String.format("%s - PHP %.2f (Perks: %s)", tierName, price, perks);
     }
 
-    int getRemainingCapacity(){
-        return maxCapacity - currentSold;
+    @Override
+    public String toString() {
+        return String.format("%s - PHP %.2f (Perks: %s)", tierName, price, perks);
     }
 }

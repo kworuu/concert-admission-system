@@ -3,11 +3,25 @@ package ConcertAdmissionSystem;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 public class TicketManager {
 
-    private static final String FILE_PATH = "TicketsSold.csv";
-    private static final String CSV_PATH = "concert-admission-system/ticketSold.csv";
+    private static final String CSV_PATH =
+            System.getProperty("user.dir") + File.separator + "ticketSold.csv";
+
+    private static final String FILE_PATH =
+            System.getProperty("user.dir") + File.separator + "TicketsSold.csv";
+
+    private static Path getConcertFilePath(String concertName) {
+        // Sanitize the name to be file-system friendly (replace non-alphanumeric/hyphen/dot characters with an underscore)
+        String sanitizedName = concertName.replaceAll("[^a-zA-Z0-9.-]", "_");
+        String fileName = sanitizedName + "TicketsSold.csv";
+        return Paths.get(fileName);
+    }
 
     // Check if ticket was already used
     public static boolean isTicketUsed(String ticketID) {
@@ -77,34 +91,52 @@ public class TicketManager {
         }
     }
 
-    public static void saveTicket(String seat, String name, String email, String age, String price, String tier) {
-        try {
-            File file = new File(FILE_PATH);
-            boolean isNewFile = !file.exists();
+    public static void saveTicket(Ticket ticket, String concertName) {
+        Path filePath = getConcertFilePath(concertName);
+        File file = filePath.toFile();
 
+        try {
+            // Check if the file exists and is empty to determine if the header is needed
+            boolean isNewFile = !Files.exists(filePath) || Files.size(filePath) == 0;
+
+            // Use FileWriter with true for append mode
             BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
 
             if (isNewFile) {
-                writer.write("SeatNumber,CustomerName,Email,Age,Price,Tier");
+                // Header must be written only once
+                writer.write("SeatNumber,CustomerName,Email,Age,Price,Tier,TicketID");
                 writer.newLine();
             }
 
-            String record = seat + "," + name + "," + email + "," + age + "," + price + "," + tier;
+            // Extract data directly from the Ticket object hierarchy
+            // Note: Assuming getSeatNumber() and getSeating() methods exist in Ticket/Seat classes.
+            String seat  = ticket.getSeat().getSeatNumber();
+            String name  = ticket.getCustomer().getName();
+            String email = ticket.getCustomer().getEmail();
+            String age   = String.valueOf(ticket.getCustomer().getAge());
+            String price = String.format("%.2f", ticket.getPrice());
+            String tier  = ticket.getSeating().getTierName();
+            String id    = ticket.getTicketID();
+
+            // Create CSV record
+            String record = String.join(",", seat, name, email, age, price, tier, id);
 
             writer.write(record);
             writer.newLine();
             writer.close();
 
         } catch (IOException e) {
-            System.out.println("Error saving ticket: " + e.getMessage());
+            System.err.println("Error saving ticket: " + e.getMessage());
         }
     }
 
-    public static List<String> loadSoldSeats() {
+    public static List<String> loadSoldSeats(String concertName) {
         List<String> soldSeats = new ArrayList<>();
-        File file = new File(FILE_PATH);
+        Path filePath = getConcertFilePath(concertName);
+        File file = filePath.toFile();
 
-        if (!file.exists()) {
+        if (!Files.exists(filePath)) {
+            // File does not exist for this concert, return empty list
             return soldSeats;
         }
 
@@ -116,18 +148,20 @@ public class TicketManager {
             while ((line = reader.readLine()) != null) {
                 if (isFirstLine) {
                     isFirstLine = false;
-                    continue;
+                    continue; // Skip the header line
                 }
 
                 String[] data = line.split(",");
+                // The Seat Number (identifier) is at index 0
                 if (data.length > 0) {
                     soldSeats.add(data[0].trim());
                 }
             }
             reader.close();
         } catch (IOException e) {
-            System.out.println("Error loading tickets: " + e.getMessage());
+            System.err.println("Error loading tickets: " + e.getMessage());
         }
         return soldSeats;
     }
 }
+
