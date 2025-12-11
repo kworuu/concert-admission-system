@@ -162,7 +162,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
         pack();
         setLocationRelativeTo(null);
 
-        concertManager = new ConcertManager();
+        concertManager = ConcertManager.getInstance();
 
 // Set the detail fields to read-only
         details_concertDate.setEditable(false);

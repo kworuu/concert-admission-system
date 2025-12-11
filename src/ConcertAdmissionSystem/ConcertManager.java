@@ -18,7 +18,7 @@ public class ConcertManager {
     private final List<Concert> availableConcerts;
 
     // 3. Private Constructor: Prevents external classes from creating new instances
-    public ConcertManager() {
+    private ConcertManager() {
         // Initialize the list when the manager is first created
         this.availableConcerts = new ArrayList<>();
 
