@@ -55,5 +55,8 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="flatlaf-demo-3.7" level="project" />
+    <orderEntry type="library" name="flatlaf-extras-3.7" level="project" />
+    <orderEntry type="library" name="jsvg-2.0.0" level="project" />
   </component>
 </module>
