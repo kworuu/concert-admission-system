@@ -12,7 +12,6 @@ import java.util.List;
 import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.awt.BorderLayout;
 
@@ -61,6 +60,18 @@ public class ConcertAdmissionSystemUI extends JFrame {
     private JLabel venueLbl;
     private JLabel concertDateLbl;
     private JLabel artistLbl;
+    private JButton btnScanQRCode;
+    private JLabel nameLbl;
+    private JLabel emailLbl;
+    private JLabel ageLbl;
+    private JLabel selectedSeatLbl;
+    private JLabel seatTierlbl;
+    private JLabel perksLbl;
+    private JLabel priceLbl;
+    private JLabel selectConcertLabel;
+    private JLabel filterTierLbl;
+    private JLabel capacityStatusLabel;
+    private JPanel buttonsPanel;
 
     // Create Lists to Group Buttons
     private final List<JButton> vvip_buttons = new ArrayList<>();
@@ -91,52 +102,77 @@ public class ConcertAdmissionSystemUI extends JFrame {
 
         customizeVisuals();
         styleCTAButton();
+        styleDropdown();
+        styleReadOnlyFields();
+        adjustFonts();
+        styleProgressBar();
 
         // --- MAIN LAYOUT ---
         JPanel mainWrapper = new JPanel(new BorderLayout());
 
-        // --- A. HEADER (SVG Logo + Text) ---
-        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        topBar.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+// --- A. HEADER (Logo + Gradient Text) ---
+        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0)); // 20px gap between Logo and Text
+        topBar.setBorder(BorderFactory.createEmptyBorder(15, 0, 20, 0));
 
-        // SVG FILE PATH
+// 1. THE LOGO (Icon Only)
+        JLabel logoLabel = new JLabel();
         String logoPath = "src/assets/logos/logo4.svg";
-
-        JLabel headerLabel = new JLabel("Wildcats Pub Concerts");
-
-        // --- NEW SVG LOADING LOGIC ---
         File svgFile = new File(logoPath);
+
         if (svgFile.exists()) {
             try {
-                // 1. Load the SVG
                 FlatSVGIcon svgIcon = new FlatSVGIcon(svgFile);
-
-                // 2. Scale it to 100px height (Calculate width to keep aspect ratio)
-                //    (We check if height is > 0 to avoid divide-by-zero errors)
+                // Scale to 80px height (Slightly smaller to match 36px text better)
                 if (svgIcon.getIconHeight() > 0) {
-                    float scale = 100f / svgIcon.getIconHeight();
+                    float scale = 80f / svgIcon.getIconHeight();
                     int newWidth = Math.round(svgIcon.getIconWidth() * scale);
-
-                    // 3. Derive a new icon with the exact size
-                    headerLabel.setIcon(svgIcon.derive(newWidth, 100));
+                    logoLabel.setIcon(svgIcon.derive(newWidth, 80));
                 } else {
-                    headerLabel.setIcon(svgIcon); // Fallback if size unknown
+                    logoLabel.setIcon(svgIcon);
                 }
             } catch (Exception e) {
                 System.out.println("Error loading SVG: " + e.getMessage());
             }
         }
-        // -----------------------------
 
-        headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        headerLabel.setForeground(new Color(51, 153, 255));
-        headerLabel.setIconTextGap(20);
-        headerLabel.setHorizontalTextPosition(JLabel.RIGHT);
-        headerLabel.setVerticalTextPosition(JLabel.CENTER);
+        JLabel titleLabel = new JLabel("Wildcats Pub Concerts") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                // Enable anti-aliasing for smooth text
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        topBar.add(headerLabel);
+                // GRADIENT DEFINITION
+                // Start: Brand Blue (51, 153, 255)
+                // End:   Vibrant Violet (147, 51, 234)
+                // The middle automatically blends into a nice Purple.
+                GradientPaint gradient = new GradientPaint(
+                        0, 0, new Color(51, 153, 255),
+                        getPreferredSize().width, 0, new Color(147, 51, 234)
+                );
+
+                g2.setPaint(gradient);
+
+                // Draw the text manually to apply the gradient
+                FontMetrics fm = g2.getFontMetrics();
+                int x = 0;
+                // Center vertically based on font height
+                int y = ((getHeight() - fm.getHeight()) / 2) + fm.getAscent();
+
+                g2.drawString(getText(), x, y);
+            }
+        };
+
+// 3. APPLY FONT (Size 36)
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
+// We need to set a preferred size so the layout manager knows how much space the custom text needs
+        titleLabel.setPreferredSize(new Dimension(450, 80));
+
+// Add them separately
+        topBar.add(logoLabel);
+        topBar.add(titleLabel);
+
         mainWrapper.add(topBar, BorderLayout.NORTH);
-
 
         // --- B. SCROLLABLE CONTENT ---
         JPanel bodyWrapper = new JPanel(new BorderLayout());
@@ -201,7 +237,7 @@ public class ConcertAdmissionSystemUI extends JFrame {
                 // Find the corresponding Concert object in your list
                 if (selectedName != null) {
                     Concert concert = concertManager.getConcertByTitle(selectedName);
-                    if(concert != null) {
+                    if (concert != null) {
                         loadConcertDetails(concert);
                     }
                 }
@@ -232,8 +268,42 @@ public class ConcertAdmissionSystemUI extends JFrame {
                 confirmPurchase();
             }
         });
-    }
 
+        if (btnScanQRCode == null) {
+            btnScanQRCode = new JButton("Scan QR (Admin)");
+        }
+
+
+        styleScanButton();
+
+// Add the Listener to open the Scanner
+        btnScanQRCode.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        TicketScanner scanner = new TicketScanner();
+
+                        // --- FIX STARTS HERE ---
+                        // 1. Force the layout to calculate size immediately
+                        scanner.pack();
+
+                        // 2. Center it on the screen (null = center of monitor)
+                        scanner.setLocationRelativeTo(null);
+
+                        // OPTIONAL: If you want it centered over your APP specifically, use this instead:
+                        // scanner.setLocationRelativeTo(ConcertAdmissionSystemUI.this);
+                        // -----------------------
+
+                        scanner.setVisible(true);
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(ConcertAdmissionSystemUI.this,
+                                "Error launching scanner: " + ex.getMessage());
+                    }
+                });
+            }
+        });
+    }
     public void initalizeSeatButtons() {
         ActionListener seatListener = new ActionListener() {
             @Override
@@ -770,9 +840,12 @@ public class ConcertAdmissionSystemUI extends JFrame {
         // All validations passed → create object
         return new Customer(name, email, age);
     }
+
     private void customizeVisuals() {
-        Font headerFont = new Font(Font.SANS_SERIF, Font.BOLD, 18);
-        Color headerColor = new Color(51, 153, 255);
+        // INCREASED SIZE: From 18 to 24 for the main headers
+        Font headerFont = new Font("Segoe UI", Font.BOLD, 24);
+        Color headerColor = new Color(51, 153, 255); // Brand Blue
+
         styleSectionPanel(concertDetailsPanel, "1. Concert Details", headerFont, headerColor);
         styleSectionPanel(customerInformationPanel, "2. Customer Information", headerFont, headerColor);
         styleSectionPanel(seatSelectionPanel, "3. Seat Selection", headerFont, headerColor);
@@ -803,61 +876,257 @@ public class ConcertAdmissionSystemUI extends JFrame {
                         BorderFactory.createEmptyBorder(15, 40, 15, 40)
                 )
         );
+
+    }
+    private void styleScanButton() {
+        if (btnScanQRCode == null) return;
+
+        // 1. Smaller Font than the Confirm button (14 vs 18)
+        btnScanQRCode.setFont(new Font("Segoe UI", Font.BOLD, 14));
+
+        // 2. "Admin Blue" color to differentiate from "Success Green"
+        Color adminBlue = new Color(0, 123, 255);
+        btnScanQRCode.setBackground(adminBlue);
+        btnScanQRCode.setForeground(Color.WHITE);
+
+        // 3. UX touches
+        btnScanQRCode.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnScanQRCode.setFocusPainted(false);
+
+        // 4. Smaller Padding (Compact look)
+        btnScanQRCode.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(adminBlue, 1),
+                        BorderFactory.createEmptyBorder(10, 20, 10, 20) // Smaller padding than confirm btn
+                )
+        );
     }
 
-                public void resetAllSeats() {
-                    List<JButton> allButtons = new ArrayList<>();
-                    allButtons.addAll(vvip_buttons);
-                    allButtons.addAll(vip_buttons);
-                    allButtons.addAll(generalAdmission_buttons);
+    private void styleDropdown() {
+        if (cmbox_selectConcert == null) return;
 
-                    // Reset the currently selected seat, if any
-                    if (selectedSeat != null) {
-                        resetSeatColor(selectedSeat); // Resets the color from the temporary COLOR_SELECTED
-                        selectedSeat = null; // Unselect the seat
-                    }
-                    // Clear the selection labels
-                    selectedSeatLabel.setText("~none");
-                    priceLabel.setText("PHP 0.00");
-                    seatTierLabel.setText("~none");
-                    perksLabel.setText("~none");
+        Color brandBlue = new Color(51, 153, 255);
+        Color darkBackground = new Color(45, 48, 50); // Distinct dark background for the box
 
+        // 1. Style the Main Box
+        cmbox_selectConcert.setBackground(darkBackground);
+        cmbox_selectConcert.setForeground(Color.WHITE);
+        cmbox_selectConcert.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cmbox_selectConcert.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-                    // Reset all buttons to their default state
-                    for (JButton btn : allButtons) {
-                        // Use the button's internal Name property which we set in groupButtons()
-                        String originalSeatID = btn.getName();
+        // 2. Add the "Contrasting Stroke" (Border)
+        cmbox_selectConcert.setBorder(BorderFactory.createCompoundBorder(
+                new javax.swing.border.LineBorder(brandBlue, 1, true),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5) // External padding
+        ));
 
-                        // Safety check: if name is not set, use a generic fallback.
-                        if (originalSeatID == null) {
-                            originalSeatID = "Seat"; // Keep this fallback just in case
-                        }
+        // 3. CUSTOM RENDERER (Controls the Dropdown List Appearance)
+        cmbox_selectConcert.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                // Let the superclass handle the basic text setup
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                        btn.setText(originalSeatID); // <-- FIX: Sets the correct seat ID (e.g., VVA1)
+                // A. ALIGNMENT: Add 5px padding inside the dropdown items so text aligns
+                setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-                        // Re-initialize the button based on its group
-                        if (vvip_buttons.contains(btn)) {
-                            btn.setBackground(COLOR_VVIP);
-                        } else if (vip_buttons.contains(btn)) {
-                            btn.setBackground(COLOR_VIP);
-                        } else { // generalAdmission_buttons
-                            btn.setBackground(COLOR_GEN);
-                        }
-
-                        // Reset text color and styling
-                        btn.setForeground(Color.BLACK); // Set text color back to default
-                        btn.setOpaque(true);
-                        btn.setContentAreaFilled(true);
-                        btn.setBorderPainted(true);
-                    }
-
-                    // Reset sold seat count and progress bar display
-                    soldSeats = 0;
-                    progressBar1.setValue(0);
-                    progressBar1.setString("0 / " + maximumCapacity + " Sold");
-
-                    // Recalculate and repaint the panel
-                    panelInsideScroll.revalidate();
-                    panelInsideScroll.repaint();
+                // B. COLORS
+                if (isSelected) {
+                    // When hovered/selected: Brand Blue
+                    setBackground(brandBlue);
+                    setForeground(Color.WHITE);
+                } else {
+                    // Unselected Items: Slightly lighter/different grey than the main background
+                    // This makes the expanded menu visually distinct
+                    setBackground(new Color(60, 63, 65));
+                    setForeground(Color.WHITE);
                 }
+                return this;
+            }
+        });
+    }
+
+    private void styleProgressBar() {
+        if (progressBar1 == null) return;
+
+        // 1. MAKE IT THICKER (Height)
+        // We set height to 30px.
+        // The width (200) is just a placeholder; your Layout Manager will still stretch it to fill the row.
+        progressBar1.setPreferredSize(new Dimension(200, 30));
+
+        // 2. MAKE TEXT CLEARER
+        // Bold font makes it stand out against the colored bar
+        progressBar1.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        progressBar1.setStringPainted(true); // Ensures text is shown
+
+        // 3. ENHANCE COLORS
+        // Fill Color: Your Brand Blue
+        progressBar1.setForeground(new Color(51, 153, 255));
+        // Background (Empty part): Darker grey for high contrast
+        progressBar1.setBackground(new Color(45, 48, 50));
+    }
+
+    private void styleReadOnlyFields() {
+        JTextField[] fields = {details_venue, details_concertDate, details_artist};
+
+        // Style constants
+        Color fieldBackground = new Color(60, 63, 65);
+        Color fieldBorderColor = new Color(80, 80, 80);
+        Font fieldFont = new Font("Segoe UI", Font.PLAIN, 14);
+
+        for (JTextField field : fields) {
+            if (field == null) continue;
+
+            field.setOpaque(true);
+            field.setBackground(fieldBackground);
+            field.setForeground(Color.WHITE);
+            field.setFont(fieldFont);
+
+            // --- ALIGNMENT FIX ---
+            // We set the margin (padding) explicitly.
+            // 12px on the left matches the Dropdown's text position.
+            field.setMargin(new Insets(5, 12, 5, 5));
+
+            field.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(fieldBorderColor, 1),
+                    // We keep the empty border small because setMargin handles the text push
+                    BorderFactory.createEmptyBorder(0, 0, 0, 0)
+            ));
+
+            field.setEditable(false);
+            field.setFocusable(false);
+        }
+    }
+
+    private void adjustFonts() {
+        // 1. DEFINE FONTS & COLORS
+        // Labels are now 16px (Distinctly smaller than the 24px Headers)
+        Font labelFontBig   = new Font("Segoe UI", Font.BOLD, 16);
+
+        // Receipt details remain standard
+        Font labelFontReg   = new Font("Segoe UI", Font.BOLD, 14);
+
+        // Price remains the "Pop" element
+        Font priceFont      = new Font("Segoe UI", Font.BOLD, 20);
+
+        Color labelColor    = new Color(200, 200, 200); // Light Grey
+        Color priceColor    = new Color(255, 85, 85);   // Bright Red
+
+        // 2. GROUP 1: The Main Field Labels
+        // These will be styled to 16px Bold
+        JLabel[] bigLabels = {
+                venueLbl, concertDateLbl, artistLbl,
+                nameLbl, emailLbl, ageLbl,
+                // Make sure these variables exist in your class:
+                selectConcertLabel, capacityStatusLabel, filterTierLbl
+        };
+
+        for (JLabel lbl : bigLabels) {
+            if (lbl != null) {
+                lbl.setFont(labelFontBig);
+                lbl.setForeground(labelColor);
+            }
+        }
+
+        // 3. GROUP 2: Receipt Details (Smaller/Standard)
+        JLabel[] regularBoldLabels = {
+                perksLabel, selectedSeatLabel, seatTierLabel
+        };
+
+        for (JLabel lbl : regularBoldLabels) {
+            if (lbl != null) {
+                lbl.setFont(labelFontReg);
+                lbl.setForeground(Color.WHITE);
+            }
+        }
+
+        // 4. GROUP 3: Price Label
+        if (priceLabel != null) {
+            priceLabel.setFont(priceFont);
+            priceLabel.setForeground(priceColor);
+        }
+
+        // 5. INPUT FIELDS
+        Font inputFont = new Font("Segoe UI", Font.PLAIN, 14);
+
+        JTextField[] inputFields = {
+                enterFullNameTextField, enterEmailAddressTextField, enterAgeTextField,
+                details_venue, details_concertDate, details_artist
+        };
+
+        for (JTextField field : inputFields) {
+            if (field != null) {
+                field.setFont(inputFont);
+                if (field.isEditable()) {
+                    field.setMargin(new Insets(4, 6, 4, 6));
+                } else {
+                    field.setBorder(BorderFactory.createCompoundBorder(
+                            BorderFactory.createLineBorder(new Color(80, 80, 80), 1),
+                            BorderFactory.createEmptyBorder(5, 8, 5, 8)
+                    ));
+                }
+            }
+        }
+
+        // 6. DROPDOWNS
+        if (cmbox_selectConcert != null) cmbox_selectConcert.setFont(inputFont);
+        if (cmbox_seatingTierFilter != null) cmbox_seatingTierFilter.setFont(inputFont);
+    }
+
+    public void resetAllSeats() {
+        List<JButton> allButtons = new ArrayList<>();
+        allButtons.addAll(vvip_buttons);
+        allButtons.addAll(vip_buttons);
+        allButtons.addAll(generalAdmission_buttons);
+
+        // Reset the currently selected seat, if any
+        if (selectedSeat != null) {
+            resetSeatColor(selectedSeat); // Resets the color from the temporary COLOR_SELECTED
+            selectedSeat = null; // Unselect the seat
+        }
+        // Clear the selection labels
+        selectedSeatLabel.setText("~none");
+        priceLabel.setText("PHP 0.00");
+        seatTierLabel.setText("~none");
+        perksLabel.setText("~none");
+
+
+        // Reset all buttons to their default state
+        for (JButton btn : allButtons) {
+        // Use the button's internal Name property which we set in groupButtons()
+            String originalSeatID = btn.getName();
+
+        // Safety check: if name is not set, use a generic fallback.
+        if (originalSeatID == null) {
+            originalSeatID = "Seat"; // Keep this fallback just in case
+        }
+
+        btn.setText(originalSeatID); // <-- FIX: Sets the correct seat ID (e.g., VVA1)
+
+        // Re-initialize the button based on its group
+        if (vvip_buttons.contains(btn)) {
+            btn.setBackground(COLOR_VVIP);
+        } else if (vip_buttons.contains(btn)) {
+            btn.setBackground(COLOR_VIP);
+        } else { // generalAdmission_buttons
+            btn.setBackground(COLOR_GEN);
+        }
+
+        // Reset text color and styling
+            btn.setForeground(Color.BLACK); // Set text color back to default
+            btn.setOpaque(true);
+            btn.setContentAreaFilled(true);
+            btn.setBorderPainted(true);
+        }
+
+        // Reset sold seat count and progress bar display
+            soldSeats = 0;
+            progressBar1.setValue(0);
+            progressBar1.setString("0 / " + maximumCapacity + " Sold");
+
+        // Recalculate and repaint the panel
+            panelInsideScroll.revalidate();
+            panelInsideScroll.repaint();
+        }
+
 }
