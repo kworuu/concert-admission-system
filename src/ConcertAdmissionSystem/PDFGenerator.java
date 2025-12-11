@@ -128,6 +128,8 @@ public class PDFGenerator {
             canvas.showTextAligned(Element.ALIGN_CENTER, securityHash, TcenterX, TcenterY, 90f);
             canvas.endText();
 
+            document.newPage();
+
             // --- NEW: ADD QR CODE TO TICKET ---
             if (qrCodePath != null) {
                 try {
