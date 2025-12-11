@@ -63,14 +63,9 @@ public class PDFGenerator {
             canvas.setFontAndSize(bfSeatRow, 19); // Set a clear font size
             canvas.setColorFill(BaseColor.BLACK); // Ensure color is set
 
-            // Coordinates for the lower position (from Y=0.65in)
-            float Rllx = 574.56f;
-            float Rlly = 100.8f;
-            float Rurx = 601.92f;
-            float Rury = 100.23f; // Corrected from 69.23f (was a slight calculation error)
 
-            float RcenterX = ((Rllx + Rurx) / 2f) ; // Midpoint X
-            float RcenterY = ((Rlly + Rury) / 2f) ; // Midpoint Y
+            float RcenterX = 588.24f ; // Midpoint X
+            float RcenterY = 100.515f ; // Midpoint Y
 
             // Draw the text directly onto the canvas with rotation
             canvas.beginText();
@@ -91,14 +86,10 @@ public class PDFGenerator {
             canvas.setFontAndSize(bfSeatNum, 19); // Set a clear font size
             canvas.setColorFill(BaseColor.BLACK); // Ensure color is set
 
-            // Coordinates for the lower position (from Y=0.65in)
-            float llx = 574.56f;
-            float lly = 163.8f;
-            float urx = 601.92f;
-            float ury = 163.23f; // Corrected from 69.23f (was a slight calculation error)
 
-            float centerX = (llx + urx) / 2f; // Midpoint X
-            float centerY = (lly + ury) / 2f; // Midpoint Y
+
+            float centerX = 588.24f; // Midpoint X
+            float centerY = 163.515f; // Midpoint Y
 
             // Draw the text directly onto the canvas with rotation
             canvas.beginText();
