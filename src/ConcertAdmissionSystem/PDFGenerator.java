@@ -7,10 +7,15 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.itextpdf.text.*;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.BaseFont; // <-- ADDED: Needed for direct canvas font setting
+
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
@@ -22,6 +27,75 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PDFGenerator {
+    /**
+     * Helper method to draw the rotated seat row, seat number, and ticket ID.
+     * @param canvas The PdfContentByte object for drawing.
+     * @param seatRow The seat row string.
+     * @param seatNum The seat number string.
+     * @param securityHash The ticket ID string.
+     * @throws DocumentException If font creation fails.
+     * @throws IOException If font creation fails.
+     */
+
+    private void drawRotatedTicketData(PdfContentByte canvas, String seatRow, String seatNum, String securityHash)
+            throws DocumentException, IOException {
+
+        // --- 1. Rotated Seat Row ---
+        // Declare BaseFont inside the method or as a static final field if performance is critical
+        BaseFont bfSeatRow = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
+        canvas.setFontAndSize(bfSeatRow, 19);
+        canvas.setColorFill(BaseColor.BLACK);
+
+        float RcenterX = 588.24f;
+        float RcenterY = 100.515f;
+
+        canvas.beginText();
+        canvas.showTextAligned(
+                Element.ALIGN_CENTER,
+                seatRow,
+                RcenterX,
+                RcenterY,
+                90f
+        );
+        canvas.endText();
+
+
+        // --- 2. Rotated Seat Number ---
+        BaseFont bfSeatNum = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
+        canvas.setFontAndSize(bfSeatNum, 19);
+        canvas.setColorFill(BaseColor.BLACK);
+
+        float centerX = 588.24f;
+        float centerY = 163.515f;
+
+        canvas.beginText();
+        canvas.showTextAligned(
+                Element.ALIGN_CENTER,
+                seatNum,
+                centerX,
+                centerY,
+                90f
+        );
+        canvas.endText();
+
+        // --- 3. Rotated TicketID ---
+        BaseFont bfSeatID = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
+        canvas.setFontAndSize(bfSeatID, 5);
+        canvas.setColorFill(BaseColor.BLACK);
+
+        float TcenterX = 541.50f;
+        float TcenterY = 87f;
+
+        canvas.beginText();
+        canvas.showTextAligned(
+                Element.ALIGN_CENTER,
+                securityHash,
+                TcenterX,
+                TcenterY,
+                90f
+        );
+        canvas.endText();
+    }
 
     public String generateTicket(Ticket ticket) {
         // Data
@@ -38,6 +112,7 @@ public class PDFGenerator {
 
         // 3. Generate QR code and get its path
         String qrCodePath = generateQRCode(ticket, verificationHash);
+
 
         if (qrCodePath == null) {
             System.err.println("⚠️ Failed to generate QR code, continuing without it");
@@ -82,75 +157,28 @@ public class PDFGenerator {
             ct.go();
 
 
-            // --- 3. Rotated Seat Row ---
-            BaseFont bfSeatRow = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
-            canvas.setFontAndSize(bfSeatRow, 19); // Set a clear font size
-            canvas.setColorFill(BaseColor.BLACK); // Ensure color is set
+            // --- 3. Rotated Seat Row, Num, Ticket ID ---
 
+            drawRotatedTicketData(canvas, seatRow, seatNum, securityHash);
 
-            float RcenterX = 588.24f ; // Midpoint X
-            float RcenterY = 100.515f ; // Midpoint Y
-
-            // Draw the text directly onto the canvas with rotation
-            canvas.beginText();
-            canvas.showTextAligned(
-                    Element.ALIGN_CENTER,
-                    seatRow,
-                    RcenterX,
-                    RcenterY,
-                    90f
-            );
-            canvas.endText();
-
-
-            // --- 4. Rotated Seat Number (SEAT NUM STYLED FIX) ---
-
-            // Define the font for the rotated seat number (REQUIRED FIX)
-            BaseFont bfSeatNum = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
-            canvas.setFontAndSize(bfSeatNum, 19); // Set a clear font size
-            canvas.setColorFill(BaseColor.BLACK); // Ensure color is set
-
-
-
-            float centerX = 588.24f; // Midpoint X
-            float centerY = 163.515f; // Midpoint Y
-
-            // Draw the text directly onto the canvas with rotation
-            canvas.beginText();
-            canvas.showTextAligned(
-                    Element.ALIGN_CENTER,
-                    seatNum,
-                    centerX,
-                    centerY,
-                    90f
-            );
-            canvas.endText();
-
-            // --- 5. Rotated TicketID (SEAT NUM STYLED FIX) ---
-
-            // Define the font for the rotated seat number (REQUIRED FIX)
-            BaseFont bfSeatID = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
-            canvas.setFontAndSize(bfSeatID, 5); // Set a clear font size
-            canvas.setColorFill(BaseColor.BLACK); // Ensure color is set
-
-            // Coordinates for the lower position (from Y=0.65in)
-
-
-            float TcenterX = 541.50f; // Midpoint X
-            float TcenterY = 87f; // Midpoint Y
-
-            // Draw the text directly onto the canvas with rotation
-            canvas.beginText();
-            canvas.showTextAligned(
-                    Element.ALIGN_CENTER,
-                    securityHash,
-                    TcenterX,
-                    TcenterY,
-                    90f
-            );
-            canvas.endText();
+            // second page for QR
 
             document.newPage();
+            canvas = writer.getDirectContent();
+
+            PdfContentByte underCanvas = writer.getDirectContentUnder();
+
+            underCanvas.saveState();
+            underCanvas.setColorFill(BaseColor.WHITE);
+
+            underCanvas.rectangle(
+                    0f, 0f,
+                    document.getPageSize().getWidth(),
+                    document.getPageSize().getHeight()
+            );
+            underCanvas.fill();
+            underCanvas.restoreState();
+
 
             // --- NEW: ADD QR CODE TO TICKET ---
             if (qrCodePath != null) {
@@ -159,8 +187,8 @@ public class PDFGenerator {
 
                     // Position QR code on the left side of your ticket
                     // Adjust these coordinates based on your design
-                    float qrX = 350f;  // X position (from left)
-                    float qrY = 24f;   // Y position (from bottom)
+                    float qrX = 280f;  // X position (from left)
+                    float qrY = 22f;   // Y position (from bottom)
                     float qrSize = 150f; // QR code size
 
                     qrImage.setAbsolutePosition(qrX, qrY);
@@ -174,6 +202,9 @@ public class PDFGenerator {
                     System.err.println("⚠️ Failed to add QR code to PDF: " + e.getMessage());
                 }
             }
+
+            drawRotatedTicketData(canvas,seatRow, seatNum, securityHash);
+
 
         } catch (DocumentException | IOException e) {
             // Added IOException for BaseFont.createFont
