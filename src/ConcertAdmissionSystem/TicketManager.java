@@ -14,13 +14,12 @@ public class TicketManager {
     // The Master File (Used by the Scanner to check ALL tickets)
     private static final String MASTER_CSV_PATH = "MasterTicketList.csv";
 
-    // 1. Helper to generate the unique file path for a specific concert (Used by UI)
+    // Helper to generate the unique file path for a specific concert (Used by UI)
     private static Path getConcertFilePath(String concertName) {
         String sanitizedName = concertName.replaceAll("[^a-zA-Z0-9.-]", "_");
         return Paths.get(sanitizedName + "TicketsSold.csv");
     }
 
-    // 2. Helper to generate the Hash (MUST MATCH PDFGenerator logic exactly)
     public static String generateVerificationHash(String ticketID, String email, String seatNum) {
         try {
             String secret = "WILDCATS_SECRET_2025"; // Secret Key
