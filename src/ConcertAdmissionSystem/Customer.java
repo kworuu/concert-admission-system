@@ -22,8 +22,4 @@ public class Customer {
     public int getAge(){
         return age;
     }
-
-    void buyTicket(Ticket t) {
-        t.saveToFile();
-    }
 }

@@ -30,15 +30,11 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
         super();
 
         setTitle("🎫 WildCats Pub - Ticket Scanner");
-
-        // --- CHANGE 1: STOP KILLING THE APP ---
-        // Change EXIT_ON_CLOSE to DISPOSE_ON_CLOSE
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        // --------------------------------------
 
         setLayout(new BorderLayout());
 
-        // --- CHANGE 2: TURN OFF CAMERA WHEN CLOSED ---
+        // --- TURN OFF CAMERA WHEN CLOSED ---
         // This ensures the green camera light goes off when you close the window
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -58,27 +54,23 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
             System.out.println("Found: " + name);
 
             // Filter out OBS, DroidCam, and Virtual cameras
-            // We want a camera that DOES NOT contain these words
             if (!name.contains("OBS") && !name.contains("DroidCam") && !name.contains("Virtual")) {
                 webcam = cam;
                 System.out.println(">>> SELECTED: " + name);
-                break; // Stop looking, we found a real camera
+                break;
             }
         }
 
-// Fallback: If we couldn't find a "Real" camera, just use the default one
+        // Fallback: If we couldn't find a "Real" camera, just use the default one
         if (webcam == null) {
             System.out.println(">>> No native camera found, falling back to default.");
             webcam = Webcam.getDefault();
         }
-// -----------------------------
 
-        // --- START OF SMART RESOLUTION FIX ---
-// 1. Get all sizes the camera actually supports
+        // Get all sizes the camera actually supports
         Dimension[] nonStandardSizes = webcam.getViewSizes();
         Dimension bestSize = null;
 
-// 2. Loop through and look for 640x480 (VGA) first
         for (Dimension d : nonStandardSizes) {
             if (d.width == 640 && d.height == 480) {
                 bestSize = d;
@@ -86,12 +78,11 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
             }
         }
 
-// 3. If 640x480 isn't there, just pick the largest available size (usually the last one)
         if (bestSize == null && nonStandardSizes.length > 0) {
             bestSize = nonStandardSizes[nonStandardSizes.length - 1];
         }
 
-// 4. Set the size safely
+        // Set the size safely
         if (bestSize != null) {
             webcam.setCustomViewSizes(nonStandardSizes); // Register the sizes first
             webcam.setViewSize(bestSize);
@@ -99,7 +90,6 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
         } else {
             System.err.println("⚠️ Could not determine a valid camera resolution.");
         }
-// --- END OF SMART RESOLUTION FIX ---
 
         webcam.open();
 
@@ -113,7 +103,7 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
         // Result panel (bottom)
         resultPanel = new JPanel();
         resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
-        resultPanel.setPreferredSize(new Dimension(640, 150));
+        resultPanel.setPreferredSize(new Dimension(640, 180));
         resultPanel.setBackground(Color.WHITE);
         resultPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -175,7 +165,6 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
                     try {
                         result = new MultiFormatReader().decode(bitmap);
                     } catch (NotFoundException e) {
-                        // No QR code in frame - continue scanning
                         continue;
                     }
                 }
@@ -227,7 +216,6 @@ public class TicketScanner extends JFrame implements Runnable, ThreadFactory {
                 return;
             }
 
-            // Verify ticket
             boolean isValid = TicketManager.verifyTicket(ticketID, hash);
 
             if (isValid) {

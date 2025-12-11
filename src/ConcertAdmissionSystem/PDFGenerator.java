@@ -186,7 +186,6 @@ public class PDFGenerator {
                     Image qrImage = Image.getInstance(qrCodePath);
 
                     // Position QR code on the left side of your ticket
-                    // Adjust these coordinates based on your design
                     float qrX = 280f;  // X position (from left)
                     float qrY = 22f;   // Y position (from bottom)
                     float qrSize = 150f; // QR code size
@@ -207,7 +206,6 @@ public class PDFGenerator {
 
 
         } catch (DocumentException | IOException e) {
-            // Added IOException for BaseFont.createFont
             System.err.println("CRITICAL ERROR: Failed to initialize or write to PDF document.");
             e.printStackTrace();
             throw new RuntimeException("Failed to generate PDF ticket due to document error.", e);

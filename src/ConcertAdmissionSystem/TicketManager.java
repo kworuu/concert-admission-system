@@ -136,10 +136,12 @@ public class TicketManager {
 
     private static void saveToCsv(Path path, String record) {
         try {
-            boolean isNewFile = !Files.exists(path);
+            // Check if file doesn't exist OR if it is empty (0 bytes)
+            boolean isNewOrEmpty = !Files.exists(path) || Files.size(path) == 0;
+
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile(), true))) {
-                if (isNewFile) {
-                    // Write Header
+                if (isNewOrEmpty) {
+                    // Write Header only if file is new or completely empty
                     writer.write("TicketID,Hash,SeatNumber,CustomerName,Email,Age,Price,Tier,Status");
                     writer.newLine();
                 }

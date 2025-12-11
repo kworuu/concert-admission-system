@@ -7,7 +7,6 @@ public class Seat {
     private SeatingTier tier;
 
     public Seat(String seatNumber, String row, SeatingTier tier) {
-//        super(price, concert, seating, seat, timeBought, tierName, basePrice, perks, maxCapacity, currentSold);
         this.seatNumber = seatNumber;
         this.row = row;
         this.isTaken = false;

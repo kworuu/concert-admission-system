@@ -11,7 +11,7 @@ import java.net.URL;
 
 public class BackgroundEvent extends PdfPageEventHelper {
 
-    private String ticketType; // e.g., "GEN ADD", "VIP", "VVIP"
+    private String ticketType;
     private static final int SECOND_PAGE = 2; // Constant for the second page number
 
     // Constructor to receive the ticket type
@@ -21,28 +21,21 @@ public class BackgroundEvent extends PdfPageEventHelper {
 
     @Override
     public void onEndPage(PdfWriter writer, Document document) {
-        // The current page number is crucial for this logic
         int pageNumber = writer.getPageNumber();
 
         try {
-            // 1. Get the 'under' content layer
             PdfContentByte canvas = writer.getDirectContentUnder();
             canvas.saveState();
 
-            // 2. Determine the path for the correct image
             String filename;
             if (pageNumber == SECOND_PAGE) {
-                // Use a different method for the second page's background
                 filename = determineSecondPageImageName(this.ticketType);
             } else {
-                // Use the original method for the first page
                 filename = determineImageName(this.ticketType);
             }
 
-            // 3. Load the Image instance from the file path
             Image background = loadImageFromResources(filename);
 
-            // 4. Size & position
             float documentWidth = document.getPageSize().getWidth();
             float documentHeight = document.getPageSize().getHeight();
 
@@ -98,7 +91,6 @@ public class BackgroundEvent extends PdfPageEventHelper {
     }
 
     private Image loadImageFromResources(String filename) throws IOException, DocumentException {
-        // Assume the second page images are in the same folder, e.g., /assets/ticket-background/
         String resourcePath = "/assets/ticket-background/" + filename;
         URL resourceUrl = getClass().getResource(resourcePath);
 

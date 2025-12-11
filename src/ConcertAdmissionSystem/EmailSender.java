@@ -29,7 +29,6 @@ public class EmailSender {
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
 
-        // --- FIX FOR "PKIX PATH BUILDING FAILED" ---
         // This tells Java to trust the Gmail server, bypassing the strict certificate check.
         props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 

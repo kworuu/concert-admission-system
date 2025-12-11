@@ -230,6 +230,4 @@ public class SeatGridManager {
             selectedSeat = null; // Clear selection
         }
     }
-
-    public int getSoldSeats() { return soldSeats; }
 }

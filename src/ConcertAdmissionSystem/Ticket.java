@@ -54,10 +54,6 @@ public class Ticket {
         return price;
     }
 
-    public void printTicket(){
-        //andrei generate pdf and ticket tix eme-eme bayot
-    }
-
     public void saveToFile(){
         String concertName = this.concert.getConcertName();
         TicketManager.saveTicket(this, concertName);

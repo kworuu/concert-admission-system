@@ -1,7 +1,5 @@
 package ConcertAdmissionSystem;
 
-import java.time.LocalDate;
-
 public class SeatingTier {
     private String tierName;
     private double price;
