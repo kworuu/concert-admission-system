@@ -1,0 +1,6 @@
+TicketID,Hash,SeatNumber,CustomerName,Email,Age,Price,Tier,Status
+SI3033770,114F7354EFE29C5B,VVA3,Andre Camasura,camasuraandre@gmail.com,20,600.00,VVIP,ACTIVE
+HF0755023,16175DC0CFFF99A8,VC5,Mark Villagonzalo,camasuraandre@gmail.com,67,450.00,VIP,ACTIVE
+NV9731498,A98E7B446B374EB4,VVA4,Janelle Klyne Marimon,villagonzalomark1@gmail.com,67,600.00,VVIP,ACTIVE
+CD8812196,4EFE494941BB77E5,VC8,Andrew Carlson,camasuraandre@gmail.com,20,450.00,VIP,ACTIVE
+QJ8217525,CC0BF5387FE42F4D,GE6,Andre,andrecamasura144@gmail.com,50,200.00,General Admission,ACTIVE
